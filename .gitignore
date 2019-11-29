@@ -8,8 +8,11 @@ Thumbs.db
 .vscode
 
 # Вспомогательные файлы
+.gitignore
 *.log*
 node_modules/
+package-lock.json
 
 # Папка с собранными файлами проекта
 build/
+public/bundle*
