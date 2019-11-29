@@ -5,7 +5,7 @@ import {createTripSortTemplate} from './components/trip-sort.js'
 import {createTripListTemplate} from './components/trip-list.js'
 import {createTripDayTemplate} from './components/trip-day.js'
 import {createEventTemplate} from './components/event.js'
-import {createEditEventTemplate} from './components/edit-event.js'
+import {createEventEditTemplate} from './components/event-edit.js'
 
 
 const render = (container, template, place = `beforeEnd`, wrapper = false, wrapperAttributes = '') => {
@@ -35,7 +35,7 @@ render(tripListElement, createTripDayTemplate());
 const tripDayEventsElement = tripEventsElement.querySelector(`.trip-events__list`);
 const eventsCount = 3;
 
-render(tripDayEventsElement, createEditEventTemplate(), `beforeEnd`, `li`, `class="trip-events__item"`);
+render(tripDayEventsElement, createEventEditTemplate(), `beforeEnd`, `li`, `class="trip-events__item"`);
 
 for (let i = 0; i < eventsCount; i++) {
   render(tripDayEventsElement, createEventTemplate(), `beforeEnd`, `li`, `class="trip-events__item"`);
