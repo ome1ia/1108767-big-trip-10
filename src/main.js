@@ -84,8 +84,7 @@ const createTripDayTemplate = () => {
 };
 
 const createEventTemplate = () => {
-  return `<li class="trip-events__item">
-                  <div class="event">
+  return `        <div class="event">
                     <div class="event__type">
                       <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
                     </div>
@@ -116,13 +115,11 @@ const createEventTemplate = () => {
                     <button class="event__rollup-btn" type="button">
                       <span class="visually-hidden">Open event</span>
                     </button>
-                  </div>
-                </li>`;
+                  </div>`;
 };
 
 const createEditEventTemplate = () => {
-  return `<li class="trip-events__item">
-                  <form class="event  event--edit" action="#" method="post">
+  return `      <form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -308,12 +305,15 @@ const createEditEventTemplate = () => {
                         </div>
                       </section>
                     </section>
-                  </form>
-                </li>`;
+                  </form>`;
 };
 
-const render = (container, template, place = `beforeEnd`) => {
-  container.insertAdjacentHTML(place, template);
+const render = (container, template, place = `beforeEnd`, wrapper = false, wrapperAttributes = '') => {
+  if(wrapper) {
+    container.insertAdjacentHTML(place, `<${wrapper} ${wrapperAttributes}>${template}</{$wrapper}>`);
+  } else {
+    container.insertAdjacentHTML(place, template);
+  }
 };
 
 const siteHeaderElement = document.querySelector(`.trip-main`);
@@ -335,8 +335,8 @@ render(tripListElement, createTripDayTemplate());
 const tripDayEventsElement = tripEventsElement.querySelector(`.trip-events__list`);
 const eventsCount = 3;
 
-render(tripDayEventsElement, createEditEventTemplate());
+render(tripDayEventsElement, createEditEventTemplate(), `beforeEnd`, `li`, `class="trip-events__item"`);
 
 for (let i = 0; i < eventsCount; i++) {
-  render(tripDayEventsElement, createEventTemplate());
+  render(tripDayEventsElement, createEventTemplate(), `beforeEnd`, `li`, `class="trip-events__item"`);
 }
