@@ -29,3 +29,6 @@ render(siteNavTitleElement, createMenuTemplate(), `afterEnd`);
 render(siteFilterTitleElement, createFiltersTemplate(), `afterEnd`);
 render(tripEventsElement, createTripSortTemplate());
 render(tripEventsElement, createTripListTemplate(tripData));
+
+const firstDay = tripEventsElement.querySelector(`.trip-events__list`);
+render(firstDay, createEventEditTemplate(), `afterBegin`);
