@@ -2,16 +2,16 @@ import {getRandom} from '../utils/random.js';
 
 const getEventType = () => {
   const eventTypes = [
-    `taxi`,
-    `bus`,
-    `train`,
-    `ship`,
-    `transport`,
-    `drive`,
-    `flight`,
-    `check`,
-    `sightseeing`,
-    `restaurant`];
+    `Taxi`,
+    `Bus`,
+    `Train`,
+    `Ship`,
+    `Transport`,
+    `Drive`,
+    `Flight`,
+    `Check`,
+    `Sightseeing`,
+    `Restaurant`];
 
   return eventTypes[getRandom(eventTypes.length - 1)];
 };
@@ -102,11 +102,15 @@ const getOptions = () => {
 
 const getEvent = (date) => {
   let {day, startTime, endTime} = getDate(date);
+  let type = getEventType();
+  let city = getCity();
+  let title = `${type} ${city}`;
 
   return {
-    type: getEventType(),
-    city: getCity(),
+    type,
+    city,
     photoes: getPhotoes(),
+    title,
     description: getDescription(),
     day,
     startTime,

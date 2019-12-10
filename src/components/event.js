@@ -43,9 +43,9 @@ export const createEventTemplate = (event) => {
   const setOptions = (items) => {
     let template = ``;
 
-    for (let i = 0; i < items.length; i++) {
-      let offerTitle = items[i].title;
-      let offerPrice = items[i].price;
+    for (let item of items) {
+      let offerTitle = item.title;
+      let offerPrice = item.price;
 
       template += `<li class="event__offer">
                 <span class="event__offer-title">${offerTitle}</span>
@@ -64,7 +64,7 @@ export const createEventTemplate = (event) => {
     return template;
   };
 
-  let {type, description, startTime, endTime, price, options} = event;
+  let {type, title, startTime, endTime, price, options} = event;
 
   let icon = Icons[type.toUpperCase()];
   let startTimeFormatted = parseTime(startTime);
@@ -76,7 +76,7 @@ export const createEventTemplate = (event) => {
             <div class="event__type">
               <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}.png" alt="${type}">
             </div>
-            <h3 class="event__title">${description}</h3>
+            <h3 class="event__title">${title}</h3>
 
             <div class="event__schedule">
               <p class="event__time">
