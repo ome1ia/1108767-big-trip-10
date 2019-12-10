@@ -1,23 +1,17 @@
-import {getEvent} from '../mock/event.js';
-
-export const createEventTemplate = () => {
-  let {type, description, startTime, endTime, price, options} = getEvent();
-
-  const icons = {
-    'trip': `trip`,
-    'transport': `transport`,
-    'train': `train`,
-    'taxi': `taxi`,
-    'sightseeing': `sightseeing`,
-    'ship': `ship`,
-    'restaurant': `restaurant`,
-    'flight': `flight`,
-    'drive': `drive`,
-    'check': `check-in`,
-    'bus': `bus`
+export const createEventTemplate = (event) => {
+  const Icons = {
+    TRIP: `trip`,
+    TRANSPORT: `transport`,
+    TRAIN: `train`,
+    TAXI: `taxi`,
+    SIGHTSEEING: `sightseeing`,
+    SHIP: `ship`,
+    RESTAURANT: `restaurant`,
+    FLIGHT: `flight`,
+    DRIVE: `drive`,
+    CHECK: `check-in`,
+    BUS: `bus`
   };
-
-  let icon = icons[type.toLowerCase()];
 
   const parseTime = (time) => {
     return /\d{2}:\d{2}/.exec(time.toString());
@@ -46,13 +40,6 @@ export const createEventTemplate = () => {
     return `${days}${hours}${minutes}`;
   };
 
-  console.log(startTime);
-  console.log(endTime);
-
-  let startTimeFormatted = parseTime(startTime);
-  let endTimeFormatted = parseTime(endTime);
-  let timeDiff = parseTimeDiff(endTime - startTime);
-
   const setOptions = (items) => {
     let template = ``;
 
@@ -77,6 +64,12 @@ export const createEventTemplate = () => {
     return template;
   };
 
+  let {type, description, startTime, endTime, price, options} = event;
+
+  let icon = Icons[type.toUpperCase()];
+  let startTimeFormatted = parseTime(startTime);
+  let endTimeFormatted = parseTime(endTime);
+  let timeDiff = parseTimeDiff(endTime - startTime);
   let optionsParsed = setOptions(options);
 
   return `<div class="event">

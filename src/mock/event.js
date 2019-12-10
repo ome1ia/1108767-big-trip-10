@@ -1,9 +1,4 @@
-const getRandom = (max, min = 0) => {
-
-  let rand = min + Math.random() * (max + 1 - min);
-  return Math.floor(rand);
-
-};
+import {getRandom} from '../utils/random.js';
 
 const getEventType = () => {
   const eventTypes = [
@@ -62,11 +57,8 @@ const getDescription = () => {
   return description;
 };
 
-const getDate = () => {
-  let time = new Date().getTime();
-  let dateDiff = getRandom(10) * 4 * 60 * 60 * 1000;
-
-  time += dateDiff;
+const getDate = (date) => {
+  let time = date.getTime();
   let day = new Date(time);
   let timeDiff = getRandom(12 * 60 * 60 * 1000); // пусть разница будет в пределах 24 часов
   let startTime = new Date(time - timeDiff);
@@ -108,8 +100,8 @@ const getOptions = () => {
   return options;
 };
 
-const getEvent = () => {
-  let {day, startTime, endTime} = getDate();
+const getEvent = (date) => {
+  let {day, startTime, endTime} = getDate(date);
 
   return {
     type: getEventType(),
@@ -124,13 +116,19 @@ const getEvent = () => {
   };
 };
 
-const getEventsList = (size) => {
+const getEventsList = (size, date) => {
   let eventList = [];
 
   for (let i = 0; i < size; i++) {
-    let event = getEvent();
+    let event = getEvent(date);
     eventList.push(event);
   }
+
+  eventList.sort((a, b) => {
+    return a.startTime - b.startTime;
+  });
+
+  return eventList;
 };
 
 export {getEvent, getEventsList};
