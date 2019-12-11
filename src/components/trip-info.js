@@ -6,8 +6,10 @@ export const createTripInfoTemplate = (tripList) => {
       title = `${arr[0]} — … — ${arr[arr.length - 1]}`;
     } else {
       title = arr.reduce((text, item) => {
-        text += ` &mdash; ${item}`;
+        return text += `${item} &mdash; `;
       }, ``);
+
+      title = title.slice(0, -9); // откусим ` &mdash; ` с конца
     }
 
     return title ? title : ``;
