@@ -23,7 +23,6 @@ const siteNavTitleElement = siteHeaderElement.querySelector(`.js-trip-main__nav-
 const siteFilterTitleElement = siteHeaderElement.querySelector(`.js-trip-main__filter-title`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const totalSumElement = siteHeaderElement.querySelector(`.trip-info__cost-value`);
-totalSumElement.innerHTML = ``;
 
 const tripData = getTripList();
 
@@ -32,7 +31,7 @@ render(siteNavTitleElement, createMenuTemplate(), `afterEnd`);
 render(siteFilterTitleElement, createFiltersTemplate(), `afterEnd`);
 render(tripEventsElement, createTripSortTemplate());
 render(tripEventsElement, createTripListTemplate(tripData));
-render(totalSumElement, getTotalSum(tripData));
+totalSumElement.innerHTML = getTotalSum(tripData);
 
 const firstDay = tripEventsElement.querySelector(`.trip-events__list`);
 render(firstDay, createEventEditTemplate(), `afterBegin`);
