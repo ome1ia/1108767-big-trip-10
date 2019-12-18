@@ -1,7 +1,7 @@
 import {getRandom} from '../utils/random.js';
 
 const getEventType = () => {
-  const eventTypes = [
+  const EventTypes = [
     `Taxi`,
     `Bus`,
     `Train`,
@@ -13,18 +13,18 @@ const getEventType = () => {
     `Sightseeing`,
     `Restaurant`];
 
-  return eventTypes[getRandom(eventTypes.length - 1)];
+  return EventTypes[getRandom(EventTypes.length - 1)];
 };
 
 const getCity = () => {
-  const cities = [`Amsterdam`, `Barselona`, `Madrid`, `Rome`];
+  const Cities = [`Amsterdam`, `Barselona`, `Madrid`, `Rome`];
 
-  return cities[getRandom(cities.length - 1)];
+  return Cities[getRandom(Cities.length - 1)];
 };
 
 const getPhotoes = () => {
   const photoesSize = getRandom(6);
-  let photoes = [];
+  const photoes = [];
 
   for (let i = 0; i < photoesSize; i++) {
     photoes.push(`http://picsum.photos/300/150?r=${Math.random()}`);
@@ -34,7 +34,7 @@ const getPhotoes = () => {
 };
 
 const getDescription = () => {
-  const lipsum = `Lorem ipsum dolor sit amet, 
+  const Lipsum = `Lorem ipsum dolor sit amet, 
     consectetur adipiscing elit. 
     Cras aliquet varius magna, non porta ligula feugiat eget. 
     Fusce tristique felis at fermentum pharetra. 
@@ -47,22 +47,22 @@ const getDescription = () => {
     Nunc fermentum tortor ac porta dapibus. 
     In rutrum ac purus sit amet tempus.`.split(`. `);
 
-  let descriptionSize = getRandom(1, 3);
+  const descriptionSize = getRandom(1, 3);
   let description = ``;
 
   for (let i = 0; i < descriptionSize; i++) {
-    description += lipsum[getRandom(lipsum.length - 1)];
+    description += Lipsum[getRandom(Lipsum.length - 1)];
   }
 
   return description;
 };
 
 const getDate = (date) => {
-  let time = date.getTime();
-  let day = new Date(time);
-  let timeDiff = getRandom(12 * 60 * 60 * 1000); // пусть разница будет в пределах 24 часов
-  let startTime = new Date(time - timeDiff);
-  let endTime = new Date(time + timeDiff);
+  const time = date.getTime();
+  const day = new Date(time);
+  const timeDiff = getRandom(12 * 60 * 60 * 1000); // пусть разница будет в пределах 24 часов
+  const startTime = new Date(time - timeDiff);
+  const endTime = new Date(time + timeDiff);
 
   return {
     day,
@@ -75,8 +75,8 @@ const getPrice = () => {
   return getRandom(200);
 };
 
-const getOptions = () => {
-  const optonDescription = [
+const getOptions = (optionType) => {
+  const OptonDescription = [
     `Order Uber`,
     `Add luggage`,
     `Switch to comfort`,
@@ -86,13 +86,14 @@ const getOptions = () => {
     `Lunch in city`
   ];
 
-  let optionsSize = getRandom(2);
-  let options = [];
+  const optionsSize = getRandom(2);
+  const options = [];
 
   for (let i = 0; i < optionsSize; i++) {
     options.push({
-      type: `option`, // а какой тип может быть? В ТЗ написано "дополнительные опции — это структура данных с типом, названием и ценой."
-      title: optonDescription[getRandom(optonDescription.length - 1)],
+      type: optionType,
+      active: true,
+      title: OptonDescription[getRandom(OptonDescription.length - 1)],
       price: getRandom(200)
     });
   }
@@ -101,10 +102,10 @@ const getOptions = () => {
 };
 
 const getEvent = (date) => {
-  let {day, startTime, endTime} = getDate(date);
-  let type = getEventType();
-  let city = getCity();
-  let title = `${type} ${city}`;
+  const {day, startTime, endTime} = getDate(date);
+  const type = getEventType();
+  const city = getCity();
+  const title = `${type} ${city}`;
 
   return {
     type,
@@ -116,15 +117,15 @@ const getEvent = (date) => {
     startTime,
     endTime,
     price: getPrice(),
-    options: getOptions()
+    options: getOptions(type)
   };
 };
 
 const getEventsList = (size, date) => {
-  let eventList = [];
+  const eventList = [];
 
   for (let i = 0; i < size; i++) {
-    let event = getEvent(date);
+    const event = getEvent(date);
     eventList.push(event);
   }
 

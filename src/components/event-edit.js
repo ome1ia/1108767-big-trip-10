@@ -16,11 +16,11 @@ export const createEventEditTemplate = () => {
   };
 
   const parseTime = (time) => {
-    let year = time.getFullYear();
-    let month = time.getMonth();
-    let day = time.getDate();
-    let hours = time.getHours();
-    let minutes = time.getMinutes();
+    const year = time.getFullYear();
+    const month = time.getMonth();
+    const day = time.getDate();
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
 
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
@@ -29,8 +29,8 @@ export const createEventEditTemplate = () => {
     let template = ``;
 
     for (let item of items) {
-      let offerTitle = item.title;
-      let offerPrice = item.price;
+      const offerTitle = item.title;
+      const offerPrice = item.price;
 
       template += `<div class="event__offer-selector">
                     <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage">
@@ -55,14 +55,14 @@ export const createEventEditTemplate = () => {
     return template;
   };
 
-  let date = new Date();
-  let {type, city, photoes, description, startTime, endTime, price, options} = getEvent(date);
+  const date = new Date();
+  const {type, city, photoes, description, startTime, endTime, price, options} = getEvent(date);
 
-  let icon = Icons[type.toUpperCase()];
-  let startTimeFormatted = parseTime(startTime);
-  let endTimeFormatted = parseTime(endTime);
-  let optionsParsed = setOptions(options);
-  let photoesParsed = setPhotoes(photoes);
+  const icon = Icons[type.toUpperCase()];
+  const startTimeFormatted = parseTime(startTime);
+  const endTimeFormatted = parseTime(endTime);
+  const optionsParsed = setOptions(options);
+  const photoesParsed = setPhotoes(photoes);
 
   return `<form class="event  event--edit" action="#" method="post">
             <header class="event__header">

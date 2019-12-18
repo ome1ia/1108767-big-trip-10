@@ -6,7 +6,8 @@ export const createTripInfoTemplate = (tripList) => {
       title = `${arr[0]} — … — ${arr[arr.length - 1]}`;
     } else {
       title = arr.reduce((text, item) => {
-        return text += `${item} &mdash; `;
+        text += `${item} &mdash; `;
+        return text;
       }, ``);
 
       title = title.slice(0, -9); // откусим ` &mdash; ` с конца
@@ -18,11 +19,11 @@ export const createTripInfoTemplate = (tripList) => {
   const getPeriod = (arr) => {
     const Months = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
 
-    let startDate = arr[0];
-    let endDate = arr[arr.length - 1];
-    let monthStart = Months[startDate.getMonth()];
+    const startDate = arr[0];
+    const endDate = arr[arr.length - 1];
+    const monthStart = Months[startDate.getMonth()];
     let monthEnd;
-    let dayStart = startDate.getDate();
+    const dayStart = startDate.getDate();
     let dayEnd;
     let period;
 
@@ -40,8 +41,8 @@ export const createTripInfoTemplate = (tripList) => {
     return period;
   };
 
-  let cities = [];
-  let days = [];
+  const cities = [];
+  const days = [];
   let tripTitle;
   let tripPeriod;
 

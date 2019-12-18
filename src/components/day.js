@@ -4,32 +4,32 @@ export const createDayTemplate = (day, index) => {
   const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
   const formatDateTime = (date) => {
-    let dateDay = date.getDate();
-    let dateMonth = date.getMonth();
-    let dateYear = date.getFullYear();
+    const dateDay = date.getDate();
+    const dateMonth = date.getMonth();
+    const dateYear = date.getFullYear();
 
     return `${dateYear}-${dateMonth}-${dateDay}`;
   };
 
   const formatDate = (date) => {
-    let dateDay = date.getDate();
-    let dateMonth = Months[date.getMonth()];
+    const dateDay = date.getDate();
+    const dateMonth = Months[date.getMonth()];
 
     return `${dateMonth} ${dateDay}`;
   };
 
-  let {date, events} = day;
+  const {date, events} = day;
 
-  let dayIndex = index + 1;
+  const dayIndex = index + 1;
 
-  let dayDate = formatDate(date);
-  let dayDateTime = formatDateTime(date);
+  const dayDate = formatDate(date);
+  const dayDateTime = formatDateTime(date);
 
   let eventsRender = ``;
 
   for (let i = 0; i < events.length; i++) {
     // events отсортированы в mock/events.js. Можно перенести сортировку сюда
-    let event = createEventTemplate(events[i]);
+    const event = createEventTemplate(events[i]);
     eventsRender += event;
   }
 

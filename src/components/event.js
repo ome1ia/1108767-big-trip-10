@@ -23,9 +23,9 @@ export const createEventTemplate = (event) => {
 
   const parseTimeDiff = (diff) => {
     let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    let hoursDiff = diff - (days * 1000 * 60 * 60 * 24);
+    const hoursDiff = diff - (days * 1000 * 60 * 60 * 24);
     let hours = Math.floor(hoursDiff / (1000 * 60 * 60));
-    let minutesDiff = hoursDiff - (hours * 1000 * 60 * 60);
+    const minutesDiff = hoursDiff - (hours * 1000 * 60 * 60);
     let minutes = Math.floor(minutesDiff / (1000 * 60));
 
     if (days) {
@@ -44,8 +44,8 @@ export const createEventTemplate = (event) => {
     let template = ``;
 
     for (let item of items) {
-      let offerTitle = item.title;
-      let offerPrice = item.price;
+      const offerTitle = item.title;
+      const offerPrice = item.price;
 
       template += `<li class="event__offer">
                 <span class="event__offer-title">${offerTitle}</span>
@@ -64,13 +64,13 @@ export const createEventTemplate = (event) => {
     return template;
   };
 
-  let {type, title, startTime, endTime, price, options} = event;
+  const {type, title, startTime, endTime, price, options} = event;
 
-  let icon = Icons[type.toUpperCase()];
-  let startTimeFormatted = parseTime(startTime);
-  let endTimeFormatted = parseTime(endTime);
-  let timeDiff = parseTimeDiff(endTime - startTime);
-  let optionsParsed = setOptions(options);
+  const icon = Icons[type.toUpperCase()];
+  const startTimeFormatted = parseTime(startTime);
+  const endTimeFormatted = parseTime(endTime);
+  const timeDiff = parseTimeDiff(endTime - startTime);
+  const optionsParsed = setOptions(options);
 
   return `<div class="event">
             <div class="event__type">
