@@ -30,9 +30,10 @@ const setOptions = (items) => {
   for (let item of items) {
     const offerTitle = item.title;
     const offerPrice = item.price;
+    const isChecked = item.active ? `checked` : ``;
 
     template += `<div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage">
+                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isChecked}>
                   <label class="event__offer-label" for="event-offer-luggage-1">
                     <span class="event__offer-title">${offerTitle}</span>
                     &plus;
@@ -80,11 +81,11 @@ export default class EventEdit {
   }
 
   get _optionsParsed() {
-    setOptions(this._options);
+    return setOptions(this._options);
   }
 
   get _photoesParsed() {
-    setPhotoes(this._photoes);
+    return setPhotoes(this._photoes);
   }
 
   getTemplate() {
