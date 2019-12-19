@@ -1,6 +1,7 @@
 import {createElement} from '../utils/create-element.js';
 import {render} from '../utils/render.js';
 import Event from './event.js';
+import EventEdit from './event-edit.js';
 
 const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
@@ -58,8 +59,18 @@ export default class Day {
       const eventsContainer = this._element.querySelector(`.trip-events__list`);
 
       for (let eventData of this._events) {
-        const event = new Event(eventData);
-        const eventElement = event.getElement();
+        const eventElement = new Event(eventData).getElement();
+        const eventEditElement = new EventEdit(eventData).getElement();
+
+        const eventStartEdit = eventElement.querySelector(`.event__rollup-btn`);
+        eventStartEdit.addEventListener(`click`, () => {
+          render(eventElement, eventEditElement, `replace`);
+        });
+
+        eventEditElement.addEventListener(`submit`, () => {
+          render(eventEditElement, eventElement, `replace`);
+        });
+
         render(eventsContainer, eventElement);
       }
     }
