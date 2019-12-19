@@ -1,46 +1,74 @@
-import {createEventTemplate} from './event.js';
+import {createElement} from '../utils/create-element.js';
+import {render} from '../utils/render.js';
+import Event from './event.js';
 
-export const createDayTemplate = (day, index) => {
-  const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
+const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
-  const formatDateTime = (date) => {
-    const dateDay = date.getDate();
-    const dateMonth = date.getMonth();
-    const dateYear = date.getFullYear();
+const formatDateTime = (date) => {
+  const dateDay = date.getDate();
+  const dateMonth = date.getMonth();
+  const dateYear = date.getFullYear();
 
-    return `${dateYear}-${dateMonth}-${dateDay}`;
-  };
+  return `${dateYear}-${dateMonth}-${dateDay}`;
+};
 
-  const formatDate = (date) => {
-    const dateDay = date.getDate();
-    const dateMonth = Months[date.getMonth()];
+const formatDate = (date) => {
+  const dateDay = date.getDate();
+  const dateMonth = Months[date.getMonth()];
 
-    return `${dateMonth} ${dateDay}`;
-  };
+  return `${dateMonth} ${dateDay}`;
+};
 
-  const {date, events} = day;
+export default class Day {
 
-  const dayIndex = index + 1;
-
-  const dayDate = formatDate(date);
-  const dayDateTime = formatDateTime(date);
-
-  let eventsRender = ``;
-
-  for (let i = 0; i < events.length; i++) {
-    // events отсортированы в mock/events.js. Можно перенести сортировку сюда
-    const event = createEventTemplate(events[i]);
-    eventsRender += event;
+  constructor(day, index) {
+    this._element = null;
+    this._day = day;
+    this._index = index;
+    this._date = day.date;
+    this._events = day.events;
   }
 
-  return `<li class="trip-days__item  day">
+  get _dayIndex() {
+    return this._index + 1;
+  }
+
+  get _dayDate() {
+    return formatDate(this._date);
+  }
+
+  get _dayDateTime() {
+    return formatDateTime(this._date);
+  }
+
+  getTemplate() {
+    return `<li class="trip-days__item  day">
               <div class="day__info">
-                <span class="day__counter">${dayIndex}</span>
-                <time class="day__date" datetime="${dayDateTime}">${dayDate}</time>
+                <span class="day__counter">${this._dayIndex}</span>
+                <time class="day__date" datetime="${this._dayDateTime}">${this._dayDate}</time>
               </div>
 
-              <ul class="trip-events__list">
-              ${eventsRender}
-              </ul>
+              <ul class="trip-events__list"></ul>
             </li>`;
-};
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+      const eventsContainer = this._element.querySelector(`.trip-events__list`);
+
+      for (let eventData of this._events) {
+        const event = new Event(eventData);
+        const eventElement = event.getElement();
+        render(eventsContainer, eventElement);
+      }
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}
