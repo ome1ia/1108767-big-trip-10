@@ -1,4 +1,4 @@
-import {createElement} from '../utils/create-element.js';
+import AbstractComponent from './abstract-component.js';
 
 const getTripTitle = (arr) => {
   let title;
@@ -66,9 +66,9 @@ const getCities = (tripList) => {
   return cities;
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractComponent {
   constructor(tripList) {
-    this._element = null;
+    super();
     this._tripList = tripList;
   }
 
@@ -85,18 +85,5 @@ export default class TripInfo {
 
               <p class="trip-info__dates">${this._tripPeriod}</p>
             </div>`;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
   }
 }
