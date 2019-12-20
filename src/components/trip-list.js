@@ -1,11 +1,11 @@
-import {createElement} from '../utils/create-element.js';
-import {render} from '../utils/render.js';
+import AbstractComponent from './abstract-component.js';
 import Day from './day.js';
+import {render} from '../utils/render.js';
 
-export default class TripList {
+export default class TripList extends AbstractComponent {
 
   constructor(tripList) {
-    this._element = null;
+    super();
     this._tripList = tripList;
   }
 
@@ -13,22 +13,11 @@ export default class TripList {
     return `<ul class="trip-days"></ul>`;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
-  }
-
   renderTrips() {
     for (let i = 0; i < this._tripList.length; i++) {
       const day = new Day(this._tripList[i], i);
       const dayElement = day.getElement();
+      day.renderTrips();
 
       render(this._element, dayElement);
     }
