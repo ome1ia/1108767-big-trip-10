@@ -1,7 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 import Event from './event.js';
 import EventEdit from './event-edit.js';
-import {render} from '../utils/render.js';
+import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
 
 const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
@@ -54,22 +54,23 @@ export default class Day extends AbstractComponent {
   }
 
   renderTrips() {
-    const eventsContainer = this._element.querySelector(`.trip-events__list`);
+    const eventsContainer = this.getElement().querySelector(`.trip-events__list`);
 
     for (let eventData of this._events) {
-      const eventElement = new Event(eventData).getElement();
-      const eventEditElement = new EventEdit(eventData).getElement();
+      const event = new Event(eventData);
+      const eventEdit = new EventEdit(eventData);
 
-      const eventStartEdit = eventElement.querySelector(`.event__rollup-btn`);
+      const eventStartEdit = event.getElement().querySelector(`.event__rollup-btn`);
       eventStartEdit.addEventListener(`click`, () => {
-        render(eventElement, eventEditElement, `replace`);
+        replaceTrip(event, eventEdit);
       });
 
+      const eventEditElement = eventEdit.getElement()
       eventEditElement.addEventListener(`submit`, () => {
-        render(eventEditElement, eventElement, `replace`);
+        replaceTripForm(eventEdit, event);
       });
 
-      render(eventsContainer, eventElement);
+      render(eventsContainer, event);
     }
   }
 }

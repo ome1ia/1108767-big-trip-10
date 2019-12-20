@@ -17,24 +17,19 @@ const totalSumElement = siteHeaderElement.querySelector(`.trip-info__cost-value`
 const tripData = getTripList();
 
 const info = new TripInfo(tripData);
-const infoElement = info.getElement();
-render(tripInfoElement, infoElement, `prepend`);
+render(tripInfoElement, info, `prepend`);
 
 const menu = new Menu();
-const menuElement = menu.getElement();
-render(siteNavTitleElement, menuElement, `after`);
+render(siteNavTitleElement, menu, `after`);
 
 const filters = new Filters();
-const filtersElement = filters.getElement();
-render(siteFilterTitleElement, filtersElement, `after`)
+render(siteFilterTitleElement, filters, `after`)
 
 const tripSort = new TripSort();
-const tripSortElement = tripSort.getElement();
-render(tripEventsElement, tripSortElement, `append`);
+render(tripEventsElement, tripSort, `append`);
 
 const tripList = new TripList(tripData);
-const tripListElement = tripList.getElement();
 tripList.renderTrips();
-render(tripEventsElement, tripListElement, `append`);
+render(tripEventsElement, tripList, `append`);
 
 totalSumElement.innerHTML = getTotalSum(tripData);

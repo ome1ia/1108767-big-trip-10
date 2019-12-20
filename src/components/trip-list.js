@@ -16,10 +16,9 @@ export default class TripList extends AbstractComponent {
   renderTrips() {
     for (let i = 0; i < this._tripList.length; i++) {
       const day = new Day(this._tripList[i], i);
-      const dayElement = day.getElement();
       day.renderTrips();
 
-      render(this._element, dayElement);
+      render(this.getElement(), day);
     }
   }
 }
