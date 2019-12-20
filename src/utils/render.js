@@ -1,36 +1,57 @@
-export const render = (container, element, place = `append`, wrapper = false) => {
-  let template;
-
-  if (wrapper) {
-    template = document.createElement(wrapper);
-    template.append(element);
-  } else {
-    template = element;
-  }
+const render = (container, element, place = `append`) => {
+  const domElement = element.getElement();
 
   switch (place) {
     case `after`:
-      container.after(template);
+      container.after(domElement);
       break;
 
     case `prepend`:
-      container.prepend(template);
+      container.prepend(domElement);
       break;
 
     case `before`:
-      container.before(template);
+      container.before(domElement);
       break;
 
     case `replace`:
-      container.replaceWith(template);
+      container.replaceWith(domElement);
       break;
 
     case `append`:
-      container.append(template);
+      container.append(domElement);
       break;
 
     default:
-      container.append(template);
+      container.append(domElement);
       break;
   }
 };
+
+const replace = (oldElement, newElement) => {
+  oldElement.getElement().replaceWith(newElement.getElement());
+};
+
+const setFormWrapper = (form) => {
+  const formWrapper = document.createElement(`li`);
+  formWrapper.append(form.getElement());
+
+  return formWrapper;
+}
+
+const replaceTripForm = (form, trip) => {
+  const formWrapper = setFormWrapper(form);
+  formWrapper.replaceWith(trip.getElement());
+};
+
+const replaceTrip = (trip, form) => {
+  const formWrapper = setFormWrapper(form);
+  trip.getElement().replaceWith(formWrapper);
+};
+
+const remove = (element) => {
+  element.getElement().remove();
+  element.removeElement();
+};
+
+export {render, replace, replaceTripForm, replaceTrip, remove};
