@@ -1,100 +1,138 @@
-export const createEventTemplate = (event) => {
-  const Icons = {
-    TRIP: `trip`,
-    TRANSPORT: `transport`,
-    TRAIN: `train`,
-    TAXI: `taxi`,
-    SIGHTSEEING: `sightseeing`,
-    SHIP: `ship`,
-    RESTAURANT: `restaurant`,
-    FLIGHT: `flight`,
-    DRIVE: `drive`,
-    CHECK: `check-in`,
-    BUS: `bus`
-  };
+import {createElement} from '../utils/create-element.js';
 
-  const parseTime = (time) => {
-    return /\d{2}:\d{2}/.exec(time.toString());
-  };
+const Icons = {
+  TRIP: `trip`,
+  TRANSPORT: `transport`,
+  TRAIN: `train`,
+  TAXI: `taxi`,
+  SIGHTSEEING: `sightseeing`,
+  SHIP: `ship`,
+  RESTAURANT: `restaurant`,
+  FLIGHT: `flight`,
+  DRIVE: `drive`,
+  CHECK: `check-in`,
+  BUS: `bus`
+};
 
-  const castTimeFormat = (value) => {
-    return value < 10 ? `0${value}` : String(value);
-  };
+const parseTime = (time) => {
+  return /\d{2}:\d{2}/.exec(time.toString());
+};
 
-  const parseTimeDiff = (diff) => {
-    let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    let hoursDiff = diff - (days * 1000 * 60 * 60 * 24);
-    let hours = Math.floor(hoursDiff / (1000 * 60 * 60));
-    let minutesDiff = hoursDiff - (hours * 1000 * 60 * 60);
-    let minutes = Math.floor(minutesDiff / (1000 * 60));
+const castTimeFormat = (value) => {
+  return value < 10 ? `0${value}` : String(value);
+};
 
-    if (days) {
-      days = `${castTimeFormat(days)}D `;
-    } else {
-      days = ``;
-    }
+const parseTimeDiff = (diff) => {
+  let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hoursDiff = diff - (days * 1000 * 60 * 60 * 24);
+  let hours = Math.floor(hoursDiff / (1000 * 60 * 60));
+  const minutesDiff = hoursDiff - (hours * 1000 * 60 * 60);
+  let minutes = Math.floor(minutesDiff / (1000 * 60));
 
-    hours = `${castTimeFormat(hours)}H `;
-    minutes = `${castTimeFormat(minutes)}M`;
+  if (days) {
+    days = `${castTimeFormat(days)}D `;
+  } else {
+    days = ``;
+  }
 
-    return `${days}${hours}${minutes}`;
-  };
+  hours = `${castTimeFormat(hours)}H `;
+  minutes = `${castTimeFormat(minutes)}M`;
 
-  const setOptions = (items) => {
-    let template = ``;
+  return `${days}${hours}${minutes}`;
+};
 
-    for (let item of items) {
-      let offerTitle = item.title;
-      let offerPrice = item.price;
+const setOptions = (items) => {
+  let template = ``;
 
-      template += `<li class="event__offer">
-                <span class="event__offer-title">${offerTitle}</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-               </li>`;
-    }
+  for (let item of items) {
+    const offerTitle = item.title;
+    const offerPrice = item.price;
 
-    if (items.length) {
-      template = `<h4 class="visually-hidden">Offers:</h4>
-            <ul class="event__selected-offers">
-              ${template}
-            </ul>`;
-    }
+    template += `<li class="event__offer">
+              <span class="event__offer-title">${offerTitle}</span>
+              &plus;
+              &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+             </li>`;
+  }
 
-    return template;
-  };
+  if (items.length) {
+    template = `<h4 class="visually-hidden">Offers:</h4>
+          <ul class="event__selected-offers">
+            ${template}
+          </ul>`;
+  }
 
-  let {type, title, startTime, endTime, price, options} = event;
+  return template;
+};
 
-  let icon = Icons[type.toUpperCase()];
-  let startTimeFormatted = parseTime(startTime);
-  let endTimeFormatted = parseTime(endTime);
-  let timeDiff = parseTimeDiff(endTime - startTime);
-  let optionsParsed = setOptions(options);
+export default class Event {
+  constructor({type, title, startTime, endTime, price, options}) {
+    this._element = null;
+    this._type = type;
+    this._title = title;
+    this._startTime = startTime;
+    this._endTime = endTime;
+    this._price = price;
+    this._options = options;
+  }
 
-  return `<div class="event">
+  get _icon() {
+    return Icons[this._type.toUpperCase()];
+  }
+
+  get _startTimeFormatted() {
+    return parseTime(this._startTime);
+  }
+
+  get _endTimeFormatted() {
+    return parseTime(this._endTime);
+  }
+
+  get _timeDiff() {
+    return parseTimeDiff(this._endTime - this._startTime);
+  }
+
+  get _optionsParsed() {
+    return setOptions(this._options);
+  }
+
+  getTemplate() {
+    return `<div class="event">
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}.png" alt="${type}">
+              <img class="event__type-icon" width="42" height="42" src="img/icons/${this._icon}.png" alt="${this._type}">
             </div>
-            <h3 class="event__title">${title}</h3>
+            <h3 class="event__title">${this._title}</h3>
 
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="${startTime}">${startTimeFormatted}</time>
+                <time class="event__start-time" datetime="${this._startTime}">${this._startTimeFormatted}</time>
                 &mdash;
-                <time class="event__end-time" datetime="${endTime}">${endTimeFormatted}</time>
+                <time class="event__end-time" datetime="${this._endTime}">${this._endTimeFormatted}</time>
               </p>
-              <p class="event__duration">${timeDiff}</p>
+              <p class="event__duration">${this._timeDiff}</p>
             </div>
 
             <p class="event__price">
-              &euro;&nbsp;<span class="event__price-value">${price}</span>
+              &euro;&nbsp;<span class="event__price-value">${this._price}</span>
             </p>
 
-            ${optionsParsed}
+            ${this._optionsParsed}
 
             <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
             </button>
           </div>`;
-};
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}

@@ -4,7 +4,7 @@ import {getEventsList} from './event.js';
 const getDate = () => {
   let day;
   let time = new Date().getTime();
-  let dateDiff = getRandom(10) * 24 * 60 * 60 * 1000;
+  const dateDiff = getRandom(10) * 24 * 60 * 60 * 1000;
 
   time += dateDiff;
   day = new Date(time);
@@ -13,8 +13,8 @@ const getDate = () => {
 };
 
 const getDay = () => {
-  let size = getRandom(8, 2);
-  let date = getDate();
+  const size = getRandom(8, 2);
+  const date = getDate();
 
   return {
     date,
@@ -23,11 +23,11 @@ const getDay = () => {
 };
 
 const getTripList = () => {
-  let triplist = [];
-  let size = getRandom(3, 1);
+  const triplist = [];
+  const size = getRandom(3, 1);
 
   for (let i = 0; i < size; i++) {
-    let day = getDay();
+    const day = getDay();
     triplist.push(day);
   }
 
