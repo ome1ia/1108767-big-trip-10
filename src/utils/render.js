@@ -21,10 +21,6 @@ const render = (container, element, place = `append`) => {
     case `append`:
       container.append(domElement);
       break;
-
-    default:
-      container.append(domElement);
-      break;
   }
 };
 
