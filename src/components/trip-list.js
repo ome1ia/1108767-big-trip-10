@@ -1,6 +1,4 @@
 import AbstractComponent from './abstract-component.js';
-import Day from './day.js';
-import {render} from '../utils/render.js';
 
 export default class TripList extends AbstractComponent {
 
@@ -11,14 +9,5 @@ export default class TripList extends AbstractComponent {
 
   getTemplate() {
     return `<ul class="trip-days"></ul>`;
-  }
-
-  renderTrips() {
-    for (let i = 0; i < this._tripList.length; i++) {
-      const day = new Day(this._tripList[i], i);
-      day.renderTrips();
-
-      render(this.getElement(), day);
-    }
   }
 }
