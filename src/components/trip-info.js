@@ -29,7 +29,6 @@ const getPeriod = (days) => {
     let monthEnd;
     const dayStart = startDate.getDate();
     let dayEnd;
-  
 
     if (startDate === endDate) {
       period = `${monthStart} ${dayStart}`;
@@ -48,7 +47,7 @@ const getPeriod = (days) => {
 
 const getDays = (tripList) => {
   const days = [];
-  
+
   if (tripList.length) {
     for (let day of tripList) {
       days.push(day.date);

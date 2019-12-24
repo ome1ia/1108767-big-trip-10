@@ -1,5 +1,5 @@
-import EmptyList from '../components/empty-list.js'
-import TripSort from '../components/trip-sort.js'
+import EmptyList from '../components/empty-list.js';
+import TripSort from '../components/trip-sort.js';
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import Point from '../components/point.js';
@@ -13,7 +13,7 @@ export default class TripController {
   }
 
   render() {
-    if(this._tripData.length) {
+    if (this._tripData.length) {
       const tripSort = new TripSort();
       const tripList = new TripList();
 
@@ -40,9 +40,9 @@ export default class TripController {
 
         render(tripList.getElement(), day);
       });
-    
+
       render(this._container, tripSort, `append`);
-      render(this._container, tripList, `append`);    	
+      render(this._container, tripList, `append`);
     } else {
       const emptyList = new EmptyList();
       render(this._container, emptyList, `append`);
