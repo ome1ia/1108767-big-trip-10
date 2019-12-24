@@ -1,3 +1,5 @@
+import EmptyList from '../components/empty-list.js'
+import TripSort from '../components/trip-sort.js'
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import Point from '../components/point.js';
@@ -11,32 +13,39 @@ export default class TripController {
   }
 
   render() {
-    const tripList = new TripList();
+    if(this._tripData.length) {
+      const tripSort = new TripSort();
+      const tripList = new TripList();
 
-    this._tripData.forEach((dayData, i) => {
-      const day = new Day(dayData, i);
+      this._tripData.forEach((dayData, i) => {
+        const day = new Day(dayData, i);
 
-      dayData.events.forEach((eventData) => {
-        const point = new Point(eventData);
-        const pointEdit = new PointEdit(eventData);
-        const hideEditForm = () => {
-          pointEdit.removeEscapeHandler();
-          replaceTripForm(pointEdit, point);
-        };
+        dayData.events.forEach((eventData) => {
+          const point = new Point(eventData);
+          const pointEdit = new PointEdit(eventData);
+          const hideEditForm = () => {
+            pointEdit.removeEscapeHandler();
+            replaceTripForm(pointEdit, point);
+          };
 
-        point.setEditHandler(() => {
-          replaceTrip(point, pointEdit);
-          pointEdit.setEscapeHandler(hideEditForm);
+          point.setEditHandler(() => {
+            replaceTrip(point, pointEdit);
+            pointEdit.setEscapeHandler(hideEditForm);
+          });
+
+          pointEdit.setSubmitHandler(hideEditForm);
+
+          render(day.getPointsContainer(), point);
         });
 
-        pointEdit.setSubmitHandler(hideEditForm);
-
-        render(day.getPointsContainer(), point);
+        render(tripList.getElement(), day);
       });
-
-      render(tripList.getElement(), day);
-    });
-
-    render(this._container, tripList, `append`);
+    
+      render(this._container, tripSort, `append`);
+      render(this._container, tripList, `append`);    	
+    } else {
+      const emptyList = new EmptyList();
+      render(this._container, emptyList, `append`);
+    }
   }
 }

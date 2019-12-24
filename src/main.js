@@ -1,7 +1,6 @@
 import Menu from './components/menu.js'
 import Filters from './components/filters.js'
 import TripInfo from './components/trip-info.js'
-import TripSort from './components/trip-sort.js'
 import TripController from './controllers/trip-controller.js'
 import {getTotalSum} from './components/total-sum.js'
 import {getTripList} from './mock/day.js'
@@ -24,9 +23,6 @@ render(siteNavTitleElement, menu, `after`);
 
 const filters = new Filters();
 render(siteFilterTitleElement, filters, `after`)
-
-const tripSort = new TripSort();
-render(tripEventsElement, tripSort, `append`);
 
 const tripController = new TripController({tripData: tripData, container: tripEventsElement});
 tripController.render();
