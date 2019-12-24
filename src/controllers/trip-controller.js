@@ -1,7 +1,7 @@
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
-import Event from '../components/event.js';
-import EventEdit from '../components/event-edit.js';
+import Point from '../components/point.js';
+import PointEdit from '../components/point-edit.js';
 import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
 
 export default class TripController {
@@ -17,18 +17,21 @@ export default class TripController {
       const day = new Day(dayData, i);
 
       dayData.events.forEach((eventData) => {
-        const event = new Event(eventData);
-        const eventEdit = new EventEdit(eventData);
+        const point = new Point(eventData);
+        const pointEdit = new PointEdit(eventData);
+        const hideEditForm = () => {
+          pointEdit.removeEscapeHandler();
+          replaceTripForm(pointEdit, point);
+        };
 
-        event.setEditHandler(() => {
-          replaceTrip(event, eventEdit);
+        point.setEditHandler(() => {
+          replaceTrip(point, pointEdit);
+          pointEdit.setEscapeHandler(hideEditForm);
         });
 
-        eventEdit.setSubmitHandler(() => {
-          replaceTripForm(eventEdit, event);
-        });
+        pointEdit.setSubmitHandler(hideEditForm);
 
-        render(day.getEventsContainer(), event);
+        render(day.getPointsContainer(), point);
       });
 
       render(tripList.getElement(), day);

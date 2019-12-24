@@ -65,7 +65,7 @@ const setOptions = (items) => {
   return template;
 };
 
-export default class Event extends AbstractComponent {
+export default class Point extends AbstractComponent {
   constructor({type, title, startTime, endTime, price, options}) {
     super();
     this._type = type;

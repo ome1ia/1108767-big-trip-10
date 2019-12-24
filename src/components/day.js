@@ -39,7 +39,7 @@ export default class Day extends AbstractComponent {
     return formatDateTime(this._date);
   }
 
-  getEventsContainer() {
+  getPointsContainer() {
     return this.getElement().querySelector(`.trip-events__list`);
   }
 
