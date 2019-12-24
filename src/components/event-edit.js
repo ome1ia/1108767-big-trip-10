@@ -230,4 +230,8 @@ export default class EventEdit extends AbstractComponent {
             </section>
           </form>`;
   }
+
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
+  }
 }

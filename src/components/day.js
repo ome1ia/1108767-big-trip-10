@@ -60,13 +60,11 @@ export default class Day extends AbstractComponent {
       const event = new Event(eventData);
       const eventEdit = new EventEdit(eventData);
 
-      const eventStartEdit = event.getElement().querySelector(`.event__rollup-btn`);
-      eventStartEdit.addEventListener(`click`, () => {
+      event.setEditHandler(() => {
         replaceTrip(event, eventEdit);
       });
 
-      const eventEditElement = eventEdit.getElement()
-      eventEditElement.addEventListener(`submit`, () => {
+      eventEdit.setSubmitHandler(() => {
         replaceTripForm(eventEdit, event);
       });
 

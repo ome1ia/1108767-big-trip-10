@@ -123,4 +123,8 @@ export default class Event extends AbstractComponent {
             </button>
           </div>`;
   }
+
+  setEditHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+  }
 }
