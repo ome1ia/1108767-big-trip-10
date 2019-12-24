@@ -1,4 +1,4 @@
-import {createElement} from '../utils/create-element.js';
+import AbstractComponent from './abstract-component.js';
 
 const Icons = {
   TRIP: `trip`,
@@ -65,9 +65,9 @@ const setOptions = (items) => {
   return template;
 };
 
-export default class Event {
+export default class Event extends AbstractComponent {
   constructor({type, title, startTime, endTime, price, options}) {
-    this._element = null;
+    super();
     this._type = type;
     this._title = title;
     this._startTime = startTime;
@@ -124,15 +124,7 @@ export default class Event {
           </div>`;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  setEditHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

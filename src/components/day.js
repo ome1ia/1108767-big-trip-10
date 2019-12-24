@@ -1,7 +1,4 @@
-import {createElement} from '../utils/create-element.js';
-import {render} from '../utils/render.js';
-import Event from './event.js';
-import EventEdit from './event-edit.js';
+import AbstractComponent from './abstract-component.js';
 
 const Months = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
 
@@ -20,10 +17,10 @@ const formatDate = (date) => {
   return `${dateMonth} ${dateDay}`;
 };
 
-export default class Day {
+export default class Day extends AbstractComponent {
 
   constructor(day, index) {
-    this._element = null;
+    super();
     this._day = day;
     this._index = index;
     this._date = day.date;
@@ -42,6 +39,10 @@ export default class Day {
     return formatDateTime(this._date);
   }
 
+  getEventsContainer() {
+    return this.getElement().querySelector(`.trip-events__list`);
+  }
+
   getTemplate() {
     return `<li class="trip-days__item  day">
               <div class="day__info">
@@ -51,35 +52,5 @@ export default class Day {
 
               <ul class="trip-events__list"></ul>
             </li>`;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-      const eventsContainer = this._element.querySelector(`.trip-events__list`);
-
-      for (let eventData of this._events) {
-        const eventElement = new Event(eventData).getElement();
-        const eventEditElement = new EventEdit(eventData).getElement();
-
-        const eventStartEdit = eventElement.querySelector(`.event__rollup-btn`);
-        eventStartEdit.addEventListener(`click`, () => {
-          render(eventElement, eventEditElement, `replace`);
-        });
-
-        eventEditElement.addEventListener(`submit`, () => {
-          render(eventEditElement, eventElement, `replace`);
-        });
-
-        render(eventsContainer, eventElement);
-      }
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
   }
 }

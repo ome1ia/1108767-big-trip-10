@@ -1,4 +1,4 @@
-import {createElement} from '../utils/create-element.js';
+import AbstractComponent from './abstract-component.js';
 
 const Icons = {
   TRIP: `trip`,
@@ -55,9 +55,9 @@ const setPhotoes = (items) => {
   return template;
 };
 
-export default class EventEdit {
+export default class EventEdit extends AbstractComponent {
   constructor({type, city, photoes, description, startTime, endTime, price, options}) {
-    this._element = null;
+    super();
     this._type = type;
     this._city = city;
     this._photoes = photoes;
@@ -231,15 +231,7 @@ export default class EventEdit {
           </form>`;
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }
