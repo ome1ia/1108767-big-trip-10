@@ -37,7 +37,7 @@ const setFormWrapper = (form) => {
   formWrapper.append(form.getElement());
 
   return formWrapper;
-}
+};
 
 const replaceTripForm = (form, trip) => {
   const formWrapper = setFormWrapper(form);
