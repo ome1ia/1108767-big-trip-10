@@ -28,20 +28,15 @@ const replace = (oldElement, newElement) => {
   oldElement.getElement().replaceWith(newElement.getElement());
 };
 
-const setFormWrapper = (form) => {
-  const formWrapper = document.createElement(`li`);
-  formWrapper.append(form.getElement());
-
-  return formWrapper;
-};
-
 const replaceTripForm = (form, trip) => {
-  const formWrapper = setFormWrapper(form);
+  const formWrapper = form.getElement().parentElement;
   formWrapper.replaceWith(trip.getElement());
 };
 
 const replaceTrip = (trip, form) => {
-  const formWrapper = setFormWrapper(form);
+  const formWrapper = document.createElement(`li`);
+  formWrapper.append(form.getElement());
+
   trip.getElement().replaceWith(formWrapper);
 };
 

@@ -1,12 +1,12 @@
 import AbstractComponent from './abstract-component.js';
 
-const getTripTitle = (arr) => {
-  let title;
+const getTripTitle = (cities) => {
+  let title = ``;
 
-  if (arr.length > 3) {
-    title = `${arr[0]} — … — ${arr[arr.length - 1]}`;
+  if (cities.length > 3) {
+    title = `${cities[0]} — … — ${cities[cities.length - 1]}`;
   } else {
-    title = arr.reduce((text, item) => {
+    title = cities.reduce((text, item) => {
       text += `${item} &mdash; `;
       return text;
     }, ``);
@@ -14,29 +14,32 @@ const getTripTitle = (arr) => {
     title = title.slice(0, -9); // откусим ` &mdash; ` с конца
   }
 
-  return title ? title : ``;
+  return title;
 };
 
-const getPeriod = (arr) => {
-  const Months = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
+const getPeriod = (days) => {
+  let period = ``;
 
-  const startDate = arr[0];
-  const endDate = arr[arr.length - 1];
-  const monthStart = Months[startDate.getMonth()];
-  let monthEnd;
-  const dayStart = startDate.getDate();
-  let dayEnd;
-  let period;
+  if (days.length) {
+    const Months = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
 
-  if (startDate === endDate) {
-    period = `${monthStart} ${dayStart}`;
-  } else if (startDate.getMonth() === endDate.getMonth()) {
-    dayEnd = endDate.getDate();
-    period = `${monthStart} ${dayStart}&nbsp;&mdash;&nbsp;${dayEnd}`;
-  } else {
-    dayEnd = endDate.getDate();
-    monthEnd = Months[endDate.getMonth()];
-    period = `${monthStart} ${dayStart}&nbsp;&mdash;&nbsp;${monthEnd} ${dayEnd}`;
+    const startDate = days[0];
+    const endDate = days[days.length - 1];
+    const monthStart = Months[startDate.getMonth()];
+    let monthEnd;
+    const dayStart = startDate.getDate();
+    let dayEnd;
+
+    if (startDate === endDate) {
+      period = `${monthStart} ${dayStart}`;
+    } else if (startDate.getMonth() === endDate.getMonth()) {
+      dayEnd = endDate.getDate();
+      period = `${monthStart} ${dayStart}&nbsp;&mdash;&nbsp;${dayEnd}`;
+    } else {
+      dayEnd = endDate.getDate();
+      monthEnd = Months[endDate.getMonth()];
+      period = `${monthStart} ${dayStart}&nbsp;&mdash;&nbsp;${monthEnd} ${dayEnd}`;
+    }
   }
 
   return period;
@@ -45,8 +48,10 @@ const getPeriod = (arr) => {
 const getDays = (tripList) => {
   const days = [];
 
-  for (let day of tripList) {
-    days.push(day.date);
+  if (tripList.length) {
+    for (let day of tripList) {
+      days.push(day.date);
+    }
   }
 
   return days;
@@ -55,10 +60,12 @@ const getDays = (tripList) => {
 const getCities = (tripList) => {
   const cities = [];
 
-  for (let day of tripList) {
-    for (let event of day.events) {
-      if (!cities.length || (event.city !== cities[cities.length - 1])) {
-        cities.push(event.city);
+  if (tripList.length) {
+    for (let day of tripList) {
+      for (let event of day.events) {
+        if (!cities.length || (event.city !== cities[cities.length - 1])) {
+          cities.push(event.city);
+        }
       }
     }
   }

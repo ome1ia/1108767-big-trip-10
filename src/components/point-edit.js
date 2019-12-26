@@ -55,7 +55,7 @@ const setPhotoes = (items) => {
   return template;
 };
 
-export default class EventEdit extends AbstractComponent {
+export default class PointEdit extends AbstractComponent {
   constructor({type, city, photoes, description, startTime, endTime, price, options}) {
     super();
     this._type = type;
@@ -66,6 +66,7 @@ export default class EventEdit extends AbstractComponent {
     this._endTime = endTime;
     this._price = price;
     this._options = options;
+    this._escapeHandler = null;
   }
 
   get _icon() {
@@ -233,5 +234,15 @@ export default class EventEdit extends AbstractComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setEscapeHandler(handler) {
+    this._escapeHandler = handler;
+    document.addEventListener(`keydown`, this._escapeHandler);
+  }
+
+  removeEscapeHandler() {
+    document.removeEventListener(`keydown`, this._escapeHandler);
+    this._escapeHandler = null;
   }
 }
