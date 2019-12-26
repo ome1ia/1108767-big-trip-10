@@ -30,8 +30,6 @@ export default class Day extends AbstractComponent {
     return (this._date) ? this._index + 1 : ``;
   }
 
-
-
   get _dayDate() {
     return (this._date) ? formatDate(this._date) : ``;
   }

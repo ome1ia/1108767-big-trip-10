@@ -1,5 +1,5 @@
-import EmptyList from '../components/empty-list.js'
-import Sort from '../components/sort.js'
+import EmptyList from '../components/empty-list.js';
+import Sort from '../components/sort.js';
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import Point from '../components/point.js';
@@ -16,7 +16,7 @@ export default class TripController {
   }
 
   _getEvents() {
-  	return this._tripData.reduce((eventsList, {date, events}) => {
+    return this._tripData.reduce((eventsList, {events}) => {
       return eventsList.concat(events);
     }, []);
   }
@@ -46,7 +46,7 @@ export default class TripController {
   }
 
   _getSort() {
-  	if(!this._sort) {
+    if (!this._sort) {
       const sort = new Sort(this._sortType);
 
       sort.setSortHandler((evt) => {
@@ -64,8 +64,8 @@ export default class TripController {
       });
 
       this._sort = sort;
-  	}
-    
+    }
+
     return this._sort;
   }
 
@@ -77,7 +77,7 @@ export default class TripController {
   }
 
   _renderTripList(renderData) {
-  	renderData.forEach((dayData, i) => {
+    renderData.forEach((dayData, i) => {
       const day = new Day(dayData, i);
 
       dayData.events.forEach((eventData) => {
@@ -100,7 +100,7 @@ export default class TripController {
 
       render(this._getTripList().getElement(), day);
     });
-    
+
     render(this._container, this._getSort(), `append`);
     render(this._container, this._getTripList(), `append`);
   }
@@ -114,19 +114,19 @@ export default class TripController {
 
       switch (this._sortType) {
         case `time`:
-        renderData = this._getDataByTime();
-        break;
+          renderData = this._getDataByTime();
+          break;
 
         case `price`:
-        renderData = this._getDataByPrice();
-        break;
+          renderData = this._getDataByPrice();
+          break;
 
         default:
-        renderData = this._tripData;
-        break;
+          renderData = this._tripData;
+          break;
       }
 
-      this._renderTripList(renderData);	
+      this._renderTripList(renderData);
     }
   }
 }
