@@ -19,24 +19,25 @@ const formatDate = (date) => {
 
 export default class Day extends AbstractComponent {
 
-  constructor(day, index) {
+  constructor(day, index = null) {
     super();
     this._day = day;
     this._index = index;
     this._date = day.date;
-    this._events = day.events;
   }
 
   get _dayIndex() {
-    return this._index + 1;
+    return (this._date) ? this._index + 1 : ``;
   }
 
+
+
   get _dayDate() {
-    return formatDate(this._date);
+    return (this._date) ? formatDate(this._date) : ``;
   }
 
   get _dayDateTime() {
-    return formatDateTime(this._date);
+    return (this._date) ? formatDateTime(this._date) : ``;
   }
 
   getPointsContainer() {
