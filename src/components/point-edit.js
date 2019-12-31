@@ -56,12 +56,14 @@ const setPhotoes = (items) => {
 };
 
 export default class PointEdit extends AbstractComponent {
-  constructor({type, city, photoes, description, startTime, endTime, price, options}) {
+  constructor({id, type, city, photoes, description, isFavorite, startTime, endTime, price, options}) {
     super();
+    this._id = id;
     this._type = type;
     this._city = city;
     this._photoes = photoes;
     this._description = description;
+    this._isFavorite = isFavorite;
     this._startTime = startTime;
     this._endTime = endTime;
     this._price = price;
@@ -89,53 +91,57 @@ export default class PointEdit extends AbstractComponent {
     return setPhotoes(this._photoes);
   }
 
+  get _isFavoriteState() {
+    return (this._isFavorite) ? `checked` : ``;
+  }
+
   getTemplate() {
     return `<form class="event  event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
-                <label class="event__type  event__type-btn" for="event-type-toggle-1">
+                <label class="event__type  event__type-btn" for="event-type-toggle-${this._id}">
                   <span class="visually-hidden">Choose event type</span>
                   <img class="event__type-icon" width="17" height="17" src="img/icons/${this._icon}.png" alt="${this._type}">
                 </label>
-                <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${this._id}" type="checkbox">
 
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Transfer</legend>
 
                     <div class="event__type-item">
-                      <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-                      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
+                      <input id="event-type-taxi-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+                      <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-${this._id}">Taxi</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-                      <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
+                      <input id="event-type-bus-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+                      <label class="event__type-label  event__type-label--bus" for="event-type-bus-${this._id}">Bus</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-                      <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
+                      <input id="event-type-train-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+                      <label class="event__type-label  event__type-label--train" for="event-type-train-${this._id}">Train</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-                      <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
+                      <input id="event-type-ship-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+                      <label class="event__type-label  event__type-label--ship" for="event-type-ship-${this._id}">Ship</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-                      <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
+                      <input id="event-type-transport-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+                      <label class="event__type-label  event__type-label--transport" for="event-type-transport-${this._id}">Transport</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-                      <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
+                      <input id="event-type-drive-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+                      <label class="event__type-label  event__type-label--drive" for="event-type-drive-${this._id}">Drive</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-                      <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
+                      <input id="event-type-flight-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                      <label class="event__type-label  event__type-label--flight" for="event-type-flight-${this._id}">Flight</label>
                     </div>
                   </fieldset>
 
@@ -143,29 +149,29 @@ export default class PointEdit extends AbstractComponent {
                     <legend class="visually-hidden">Activity</legend>
 
                     <div class="event__type-item">
-                      <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-                      <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
+                      <input id="event-type-check-in-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+                      <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-${this._id}">Check-in</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-                      <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
+                      <input id="event-type-sightseeing-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+                      <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-${this._id}">Sightseeing</label>
                     </div>
 
                     <div class="event__type-item">
-                      <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-                      <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
+                      <input id="event-type-restaurant-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+                      <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-${this._id}">Restaurant</label>
                     </div>
                   </fieldset>
                 </div>
               </div>
 
               <div class="event__field-group  event__field-group--destination">
-                <label class="event__label  event__type-output" for="event-destination-1">
+                <label class="event__label  event__type-output" for="event-destination-${this._id}">
                   ${this._type}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._city}" list="destination-list-1">
-                <datalist id="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-${this._id}" type="text" name="event-destination" value="${this._city}" list="destination-list-${this._id}">
+                <datalist id="destination-list-${this._id}">
                   <option value="Amsterdam"></option>
                   <option value="Geneva"></option>
                   <option value="Chamonix"></option>
@@ -173,30 +179,30 @@ export default class PointEdit extends AbstractComponent {
               </div>
 
               <div class="event__field-group  event__field-group--time">
-                <label class="visually-hidden" for="event-start-time-1">
+                <label class="visually-hidden" for="event-start-time-${this._id}">
                   From
                 </label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${this._startTimeFormatted}">
+                <input class="event__input  event__input--time" id="event-start-time-${this._id}" type="text" name="event-start-time" value="${this._startTimeFormatted}">
                 &mdash;
-                <label class="visually-hidden" for="event-end-time-1">
+                <label class="visually-hidden" for="event-end-time-${this._id}">
                   To
                 </label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${this._endTimeFormatted}">
+                <input class="event__input  event__input--time" id="event-end-time-${this._id}" type="text" name="event-end-time" value="${this._endTimeFormatted}">
               </div>
 
               <div class="event__field-group  event__field-group--price">
-                <label class="event__label" for="event-price-1">
+                <label class="event__label" for="event-price-${this._id}">
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._price}">
+                <input class="event__input  event__input--price" id="event-price-${this._id}" type="text" name="event-price" value="${this._price}">
               </div>
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
               <button class="event__reset-btn" type="reset">Delete</button>
 
-              <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
-              <label class="event__favorite-btn" for="event-favorite-1">
+              <input id="event-favorite-${this._id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavoriteState}>
+              <label class="event__favorite-btn" for="event-favorite-${this._id}">
                 <span class="visually-hidden">Add to favorite</span>
                 <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
                   <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -230,6 +236,10 @@ export default class PointEdit extends AbstractComponent {
               </section>
             </section>
           </form>`;
+  }
+
+  setAddToFavoriteHandler(handler) {
+    this.getElement().elements[`event-favorite`].addEventListener(`change`, handler);
   }
 
   setSubmitHandler(handler) {

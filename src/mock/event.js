@@ -102,17 +102,21 @@ const getOptions = (optionType) => {
 };
 
 const getEvent = (date) => {
+  const id = getRandom(1000);
   const {day, startTime, endTime} = getDate(date);
   const type = getEventType();
   const city = getCity();
   const title = `${type} ${city}`;
+  const isFavorite = !!getRandom(1);
 
   return {
+    id,
     type,
     city,
     photoes: getPhotoes(),
     title,
     description: getDescription(),
+    isFavorite,
     day,
     startTime,
     endTime,

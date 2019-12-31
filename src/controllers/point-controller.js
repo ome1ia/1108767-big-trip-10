@@ -22,7 +22,17 @@ export default class PointController {
     });
 
     pointEdit.setSubmitHandler(hideEditForm);
+    pointEdit.setAddToFavoriteHandler(() => {
+      const newData = this._data;
+      newData.isFavorite = !this._data.isFavorite;
+      
+      this.onDataChange({point: this, newData: newData});
+    });
 
     render(this._container.getPointsContainer(), point);
+  }
+
+  onDataChange() {
+
   }
 }

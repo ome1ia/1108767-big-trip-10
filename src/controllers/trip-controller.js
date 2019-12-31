@@ -3,11 +3,13 @@ import Sort from '../components/sort.js';
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import PointController from './point-controller.js';
-import {render} from '../utils/render.js';
+import {render, replace} from '../utils/render.js';
 
 export default class TripController {
   constructor({tripData, container}) {
     this._tripData = tripData;
+    this._days = null;
+    this._points = null;
     this._container = container;
     this._tripList = null;
     this._sort = null;
@@ -36,6 +38,31 @@ export default class TripController {
     }
 
     return this._sort;
+  }
+
+  _getDays() {
+    if(!this._days) {
+      const days = new Map();
+      const points = new Map();
+      
+      this._tripData.forEach((dayData, i) => {
+        const dayPoints = new Set();
+        const day = new Day(dayData, i);
+
+        day.events.forEach((pointData) => {
+          const point = new PointController({container: day, data: pointData});
+          dayPoints.add(point);
+          points.set(point, pointData);
+        });
+
+      	days.set(day, dayPoints);
+      });
+
+      this._days = days;
+      this._points = points;
+    }
+
+    return this._days;
   }
 
   _getPoints() {
@@ -97,6 +124,11 @@ export default class TripController {
 
   _sortByDefault() {
     this._renderTripList(this._tripData);
+  }
+
+  _onDataChange({point, newData}) {
+    const newPoint = new PointController(newData);
+    replace(point, newPoint);
   }
 
   render() {
