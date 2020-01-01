@@ -3,17 +3,16 @@ import Sort from '../components/sort.js';
 import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import PointController from './point-controller.js';
-import {render, replace} from '../utils/render.js';
+import {render} from '../utils/render.js';
 
 export default class TripController {
   constructor({tripData, container}) {
     this._tripData = tripData;
-    this._days = null;
-    this._points = null;
     this._container = container;
     this._tripList = null;
     this._sort = null;
     this._sortType = `event`;
+    this._onDataChange = this._onDataChange.bind(this);
   }
 
   _getSort() {
@@ -40,31 +39,6 @@ export default class TripController {
     return this._sort;
   }
 
-  _getDays() {
-    if(!this._days) {
-      const days = new Map();
-      const points = new Map();
-      
-      this._tripData.forEach((dayData, i) => {
-        const dayPoints = new Set();
-        const day = new Day(dayData, i);
-
-        day.events.forEach((pointData) => {
-          const point = new PointController({container: day, data: pointData});
-          dayPoints.add(point);
-          points.set(point, pointData);
-        });
-
-      	days.set(day, dayPoints);
-      });
-
-      this._days = days;
-      this._points = points;
-    }
-
-    return this._days;
-  }
-
   _getPoints() {
     return this._tripData.reduce((pointsList, {events}) => {
       return pointsList.concat(events);
@@ -83,7 +57,7 @@ export default class TripController {
       const day = new Day(dayData, i);
 
       dayData.events.forEach((pointData) => {
-        const point = new PointController({container: day, data: pointData});
+        const point = new PointController({container: day, data: pointData, onDataChange: this._onDataChange});
         point.render();
       });
 
@@ -126,9 +100,26 @@ export default class TripController {
     this._renderTripList(this._tripData);
   }
 
-  _onDataChange({point, newData}) {
-    const newPoint = new PointController(newData);
-    replace(point, newPoint);
+  _onDataChange({point, newPoint}) {
+    for (let day of this._tripData) {
+      // eslinter ругается "Unexpected labeled statement         no-labels"
+      // а мне нужно выйти из 2х циклов подряд
+      let isBreaked = false;
+
+      if (isBreaked) {
+        break;
+      }
+
+      for (let oldPoint of day.events) {
+        if (oldPoint.id === newPoint.id) {
+          oldPoint = newPoint;
+          isBreaked = true;
+          break;
+        }
+      }
+    }
+
+    point.render(newPoint);
   }
 
   render() {
