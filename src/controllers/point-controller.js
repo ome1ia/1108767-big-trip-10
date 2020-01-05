@@ -23,7 +23,11 @@ export default class PointController {
 
     point.setEditHandler(() => {
       replaceTrip(point, pointEdit);
-      pointEdit.setEscapeHandler(hideEditForm);
+      pointEdit.setEscapeHandler((evt) => {
+        if (evt.key === `Escape`) {
+          hideEditForm();
+        }
+      });
     });
 
     pointEdit.setSubmitHandler(hideEditForm);

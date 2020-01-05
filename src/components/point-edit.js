@@ -1,4 +1,4 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const Icons = {
   TRIP: `trip`,
@@ -55,7 +55,7 @@ const setPhotoes = (items) => {
   return template;
 };
 
-export default class PointEdit extends AbstractComponent {
+export default class PointEdit extends AbstractSmartComponent {
   constructor({id, type, city, photoes, description, isFavorite, startTime, endTime, price, options}) {
     super();
     this._id = id;
@@ -68,6 +68,8 @@ export default class PointEdit extends AbstractComponent {
     this._endTime = endTime;
     this._price = price;
     this._options = options;
+    this._addToFavoriteHandler = null;
+    this._submitHandler = null;
     this._escapeHandler = null;
   }
 
@@ -239,10 +241,12 @@ export default class PointEdit extends AbstractComponent {
   }
 
   setAddToFavoriteHandler(handler) {
+    this._addToFavoriteHandler = handler;
     this.getElement().elements[`event-favorite`].addEventListener(`change`, handler);
   }
 
   setSubmitHandler(handler) {
+    this._submitHandler = handler;
     this.getElement().addEventListener(`submit`, handler);
   }
 
@@ -254,5 +258,10 @@ export default class PointEdit extends AbstractComponent {
   removeEscapeHandler() {
     document.removeEventListener(`keydown`, this._escapeHandler);
     this._escapeHandler = null;
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setAddToFavoriteHandler(this._AddToFavoriteHandler);
   }
 }
