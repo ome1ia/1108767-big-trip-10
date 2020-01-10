@@ -39,6 +39,7 @@ export default class PointController {
 
       this._onDataChange({point: this, newPoint: newData});
     });
+    pointEdit.setChangeTypeHandler();
 
     render(this._container.getPointsContainer(), point);
   }
