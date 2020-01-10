@@ -3,9 +3,11 @@ import PointEdit from '../components/point-edit.js';
 import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
 
 export default class PointController {
-  constructor({container, data, onDataChange}) {
+  constructor({container, data, offers, destinations, onDataChange}) {
     this._container = container;
     this._data = data;
+    this._offers = offers;
+    this._destinations = destinations;
     this._onDataChange = onDataChange;
   }
 
@@ -15,7 +17,7 @@ export default class PointController {
     }
 
     const point = new Point(this._data);
-    const pointEdit = new PointEdit(this._data);
+    const pointEdit = new PointEdit({data: this._data, offers: this._offers, destinations: this._destinations});
     const hideEditForm = () => {
       pointEdit.removeEscapeHandler();
       replaceTripForm(pointEdit, point);

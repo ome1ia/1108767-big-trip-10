@@ -1,9 +1,9 @@
 import Menu from './components/menu.js'
 import Filters from './components/filters.js'
-import TripInfo from './components/trip-info.js'
 import TripController from './controllers/trip-controller.js'
-import {getTotalSum} from './components/total-sum.js'
-import {getTripList} from './mock/day.js'
+import {getEventsList} from './mock/event.js'
+import {offers} from './mock/offer.js'
+import {getDestination} from './mock/destination.js'
 import {render} from './utils/render.js'
 
 const siteHeaderElement = document.querySelector(`.trip-main`);
@@ -13,10 +13,8 @@ const siteFilterTitleElement = siteHeaderElement.querySelector(`.js-trip-main__f
 const tripEventsElement = document.querySelector(`.trip-events`);
 const totalSumElement = siteHeaderElement.querySelector(`.trip-info__cost-value`);
 
-const tripData = getTripList();
-
-const info = new TripInfo(tripData);
-render(tripInfoElement, info, `prepend`);
+const tripData = getEventsList();
+const destinations = getDestination();
 
 const menu = new Menu();
 render(siteNavTitleElement, menu, `after`);
@@ -24,7 +22,11 @@ render(siteNavTitleElement, menu, `after`);
 const filters = new Filters();
 render(siteFilterTitleElement, filters, `after`)
 
-const tripController = new TripController({tripData: tripData, container: tripEventsElement});
+const tripController = new TripController({ tripData: tripData, 
+                                            offers: offers, 
+                                            destinations: destinations, 
+                                            container: tripEventsElement, 
+                                            sumContainer: totalSumElement,
+                                            titleContainer: tripInfoElement
+                                          });
 tripController.render();
-
-totalSumElement.innerHTML = getTotalSum(tripData);

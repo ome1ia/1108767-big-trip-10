@@ -62,9 +62,9 @@ const getCities = (tripList) => {
 
   if (tripList.length) {
     for (let day of tripList) {
-      for (let event of day.events) {
-        if (!cities.length || (event.city !== cities[cities.length - 1])) {
-          cities.push(event.city);
+      for (let point of day.points) {
+        if (!cities.length || (point.destination !== cities[cities.length - 1])) {
+          cities.push(point.destination);
         }
       }
     }
@@ -73,7 +73,7 @@ const getCities = (tripList) => {
   return cities;
 };
 
-export default class TripInfo extends AbstractComponent {
+export default class TripTitle extends AbstractComponent {
   constructor(tripList) {
     super();
     this._tripList = tripList;

@@ -18,7 +18,7 @@ const getDay = () => {
 
   return {
     date,
-    events: getEventsList(size, date)
+    points: getEventsList(size, date)
   };
 };
 

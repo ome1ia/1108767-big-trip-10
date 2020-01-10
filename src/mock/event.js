@@ -1,73 +1,28 @@
 import {getRandom} from '../utils/random.js';
+import {offers as allOffers} from './offer.js';
 
-const getEventType = () => {
-  const EventTypes = [
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`,
-    `Check`,
-    `Sightseeing`,
-    `Restaurant`];
+const getPointType = () => {
+  const PointTypes = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
 
-  return EventTypes[getRandom(EventTypes.length - 1)];
+  return PointTypes[getRandom(PointTypes.length - 1)];
 };
 
-const getCity = () => {
+const getDestination = () => {
   const Cities = [`Amsterdam`, `Barselona`, `Madrid`, `Rome`];
 
   return Cities[getRandom(Cities.length - 1)];
 };
 
-const getPhotoes = () => {
-  const photoesSize = getRandom(6);
-  const photoes = [];
-
-  for (let i = 0; i < photoesSize; i++) {
-    photoes.push(`http://picsum.photos/300/150?r=${Math.random()}`);
-  }
-
-  return photoes;
-};
-
-const getDescription = () => {
-  const Lipsum = `Lorem ipsum dolor sit amet, 
-    consectetur adipiscing elit. 
-    Cras aliquet varius magna, non porta ligula feugiat eget. 
-    Fusce tristique felis at fermentum pharetra. 
-    Aliquam id orci ut lectus varius viverra. 
-    Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. 
-    Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. 
-    Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, 
-    eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis 
-    suscipit in sed felis. Aliquam erat volutpat. 
-    Nunc fermentum tortor ac porta dapibus. 
-    In rutrum ac purus sit amet tempus.`.split(`. `);
-
-  const descriptionSize = getRandom(1, 3);
-  let description = ``;
-
-  for (let i = 0; i < descriptionSize; i++) {
-    description += Lipsum[getRandom(Lipsum.length - 1)];
-  }
-
-  return description;
-};
-
 const getDate = (date) => {
-  const time = date.getTime();
-  const day = new Date(time);
+  let time = date.getTime();
+  time += getRandom(10) * 24 * 60 * 60 * 1000;
   const timeDiff = getRandom(12 * 60 * 60 * 1000); // пусть разница будет в пределах 24 часов
-  const startTime = new Date(time - timeDiff);
-  const endTime = new Date(time + timeDiff);
+  const dateFrom = new Date(time - timeDiff).toISOString();
+  const dateTo = new Date(time + timeDiff).toISOString();
 
   return {
-    day,
-    startTime,
-    endTime
+    dateFrom,
+    dateTo
   };
 };
 
@@ -75,58 +30,46 @@ const getPrice = () => {
   return getRandom(200);
 };
 
-const getOptions = (optionType) => {
-  const OptonDescription = [
-    `Order Uber`,
-    `Add luggage`,
-    `Switch to comfort`,
-    `Rent a car`,
-    `Add breakfast`,
-    `Book tickets`,
-    `Lunch in city`
-  ];
+const getOffers = (type) => {
+  const availableOffers = allOffers.filter((offer) => {
+    return offer.type === type;
+  });
 
-  const optionsSize = getRandom(2);
-  const options = [];
+  const offersSize = getRandom(1);
 
-  for (let i = 0; i < optionsSize; i++) {
-    options.push({
-      type: optionType,
-      active: true,
-      title: OptonDescription[getRandom(OptonDescription.length - 1)],
-      price: getRandom(200)
-    });
+  const pointOffers = [];
+
+  for (let i = 0; i < offersSize; i++) {
+    const offer = availableOffers[0].offers[getRandom(1)];
+    pointOffers.push(offer);
   }
 
-  return options;
+  return pointOffers;
 };
 
 const getEvent = (date) => {
-  const id = getRandom(1000);
-  const {day, startTime, endTime} = getDate(date);
-  const type = getEventType();
-  const city = getCity();
-  const title = `${type} ${city}`;
+  const {dateFrom, dateTo} = getDate(date);
+  const destination = getDestination();
   const isFavorite = !!getRandom(1);
+  const type = getPointType();
+  const offers = getOffers(type);
 
   return {
-    id,
-    type,
-    city,
-    photoes: getPhotoes(),
-    title,
-    description: getDescription(),
-    isFavorite,
-    day,
-    startTime,
-    endTime,
-    price: getPrice(),
-    options: getOptions(type)
+    id: getRandom(1000),
+    base_price: getPrice(),
+    date_from: dateFrom,
+    date_to: dateTo,
+    destination,
+    is_favorite: isFavorite,
+    offers,
+    type
   };
 };
 
-const getEventsList = (size, date) => {
+const getEventsList = () => {
   const eventList = [];
+  const size = getRandom(20);
+  const date = new Date();
 
   for (let i = 0; i < size; i++) {
     const event = getEvent(date);
