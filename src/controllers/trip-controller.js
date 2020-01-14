@@ -20,7 +20,9 @@ export default class TripController {
     this._sortType = `event`;
     this._totalSum = null;
     this._title = null;
+    this._points = null;
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   _getSort() {
@@ -80,16 +82,21 @@ export default class TripController {
   }
 
   _renderTripList(days) {
+    const points = [];
+
     days.forEach((dayData, i) => {
       const day = new Day(dayData, i);
 
       dayData.points.forEach((pointData) => {
-        const point = new PointController({container: day, data: pointData, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange});
+        const point = new PointController({container: day, data: pointData, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange, onViewChange: this._onViewChange});
         point.render();
+        points.push(point);
       });
 
       render(this._getTripList().getElement(), day);
     });
+
+    this._points = points;
 
     render(this._container, this._getSort(), `append`);
     render(this._container, this._getTripList(), `append`);
@@ -127,26 +134,21 @@ export default class TripController {
     this._renderTripList(this._getDays());
   }
 
-  _onDataChange({point, newPoint}) {
-    for (let day of this._tripData) {
-      // eslinter ругается "Unexpected labeled statement         no-labels"
-      // а мне нужно выйти из 2х циклов подряд
-      let isBreaked = false;
-
-      if (isBreaked) {
+  _onDataChange({point, newData}) {
+    for (let oldPoint of this._tripData) {
+      if (oldPoint.id === newData.id) {
+        const newPoint = Object.assign(oldPoint, newData);
+        oldPoint = newPoint;
+        point.update(newPoint);
         break;
       }
-
-      for (let oldPoint of day.events) {
-        if (oldPoint.id === newPoint.id) {
-          oldPoint = newPoint;
-          isBreaked = true;
-          break;
-        }
-      }
     }
+  }
 
-    point.render(newPoint);
+  _onViewChange() {
+    for (let point of this._points) {
+      point.setDefaultView();
+    }
   }
 
   render() {

@@ -1,4 +1,4 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
 const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
@@ -56,7 +56,7 @@ const setOffers = (offers) => {
   return template;
 };
 
-export default class Point extends AbstractComponent {
+export default class Point extends AbstractSmartComponent {
   constructor({base_price: basePrice, date_from: dateFrom, date_to: dateTo, destination, offers, type}) {
     super();
     this._type = type;
@@ -65,6 +65,7 @@ export default class Point extends AbstractComponent {
     this._dateTo = dateTo;
     this._basePrice = basePrice;
     this._offers = offers;
+    this._editHandler = null;
   }
 
   get _title() {
@@ -101,6 +102,17 @@ export default class Point extends AbstractComponent {
     return this._basePrice;
   }
 
+  updatePoint({base_price: basePrice, date_from: dateFrom, date_to: dateTo, destination, offers, type}) {
+    this._type = type;
+    this._destination = destination;
+    this._dateFrom = dateFrom;
+    this._dateTo = dateTo;
+    this._basePrice = basePrice;
+    this._offers = offers;
+
+    this.rerender();
+  }
+
   getTemplate() {
     return `<div class="event">
             <div class="event__type">
@@ -130,6 +142,11 @@ export default class Point extends AbstractComponent {
   }
 
   setEditHandler(handler) {
+    this._editHandler = handler;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+  }
+
+  recoveryListeners() {
+    this.setEditHandler(this._editHandler);
   }
 }

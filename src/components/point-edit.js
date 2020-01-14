@@ -119,6 +119,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._dateTo = data.date_to;
     this._basePrice = data.base_price;
     this._activeOffers = data.offers;
+    this._newData = {id: data.id};
     this._offers = offers;
     this._destinations = destinations;
     this._addToFavoriteHandler = null;
@@ -152,6 +153,16 @@ export default class PointEdit extends AbstractSmartComponent {
     return parseTime(new Date(this._dateTo));
   }
 
+  get _cities() {
+    const cities = new Set();
+
+    for (let city of this._destinations) {
+      cities.add(city.name);
+    }
+
+    return cities;
+  }
+
   get _citiesAvailable() {
     return setCities(this._destinations);
   }
@@ -176,8 +187,12 @@ export default class PointEdit extends AbstractSmartComponent {
     return this._basePrice;
   }
 
-  get typeList() {
+  get _typeList() {
     return setPointTypes({activeType: this._type, id: this._id});
+  }
+
+  getNewData() {
+    return this._newData;
   }
 
   getTemplate() {
@@ -191,7 +206,7 @@ export default class PointEdit extends AbstractSmartComponent {
                 <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${this._id}" type="checkbox">
 
                 <div class="event__type-list">
-                  ${this.typeList}
+                  ${this._typeList}
                 </div>
               </div>
 
@@ -267,6 +282,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
   setAddToFavoriteHandler(handler) {
     this._addToFavoriteHandler = handler;
+    this._newData.isFavorite = this._newData.is_favorite ? !this._newData.is_favorite : !this._isFavorite;
     this.getElement().elements[`event-favorite`].addEventListener(`change`, handler);
   }
 
@@ -289,8 +305,22 @@ export default class PointEdit extends AbstractSmartComponent {
     [...this.getElement().elements[`event-type`]].forEach((input) => {
       input.addEventListener(`change`, (evt) => {
         this._type = evt.target.getAttribute(`value`);
+        this._newData.type = evt.target.getAttribute(`value`);
         this.rerender();
       });
+    });
+  }
+
+  setChangeCityHandler() {
+    this.getElement().elements[`event-destination`].addEventListener(`input`, (evt) => {
+      const newCity = evt.target.value;
+
+      if (this._cities.has(newCity)) {
+        this._destination = newCity;
+        this._newData.destination = newCity;
+        this.rerender();
+      }
+      // TODO подумать над обработкой ошибок
     });
   }
 
@@ -298,5 +328,6 @@ export default class PointEdit extends AbstractSmartComponent {
     this.setSubmitHandler(this._submitHandler);
     this.setAddToFavoriteHandler(this._AddToFavoriteHandler);
     this.setChangeTypeHandler();
+    this.setChangeCityHandler();
   }
 }
