@@ -56,11 +56,11 @@ const getEvent = (date) => {
 
   return {
     id: getRandom(1000),
-    basePrice: getPrice(),
-    dateFrom,
-    dateTo,
+    base_price: getPrice(),
+    date_from: dateFrom,
+    date_to: dateTo,
     destination,
-    isFavorite,
+    is_favorite: isFavorite,
     offers,
     type
   };
