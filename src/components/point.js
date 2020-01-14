@@ -1,21 +1,11 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
-const Icons = {
-  TRIP: `trip`,
-  TRANSPORT: `transport`,
-  TRAIN: `train`,
-  TAXI: `taxi`,
-  SIGHTSEEING: `sightseeing`,
-  SHIP: `ship`,
-  RESTAURANT: `restaurant`,
-  FLIGHT: `flight`,
-  DRIVE: `drive`,
-  CHECK: `check-in`,
-  BUS: `bus`
-};
+const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
+const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
 
 const parseTime = (time) => {
-  return /\d{2}:\d{2}/.exec(time.toString());
+  const timeParsed = /T\d{2}:\d{2}/.exec(time.toString());
+  return timeParsed[0].slice(1);
 };
 
 const castTimeFormat = (value) => {
@@ -41,21 +31,22 @@ const parseTimeDiff = (diff) => {
   return `${days}${hours}${minutes}`;
 };
 
-const setOptions = (items) => {
+const setOffers = (offers) => {
   let template = ``;
+  const offersSize = Math.min(offers.length, 3);
 
-  for (let item of items) {
-    const offerTitle = item.title;
-    const offerPrice = item.price;
+  if (offersSize) {
+    for (let i = 0; i < offersSize; i++) {
+      const offerTitle = offers[i].title;
+      const offerPrice = offers[i].price;
 
-    template += `<li class="event__offer">
+      template += `<li class="event__offer">
               <span class="event__offer-title">${offerTitle}</span>
               &plus;
               &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
              </li>`;
-  }
+    }
 
-  if (items.length) {
     template = `<h4 class="visually-hidden">Offers:</h4>
           <ul class="event__selected-offers">
             ${template}
@@ -65,49 +56,75 @@ const setOptions = (items) => {
   return template;
 };
 
-export default class Point extends AbstractComponent {
-  constructor({type, title, startTime, endTime, price, options}) {
+export default class Point extends AbstractSmartComponent {
+  constructor({base_price: basePrice, date_from: dateFrom, date_to: dateTo, destination, offers, type}) {
     super();
     this._type = type;
-    this._title = title;
-    this._startTime = startTime;
-    this._endTime = endTime;
-    this._price = price;
-    this._options = options;
+    this._destination = destination;
+    this._dateFrom = dateFrom;
+    this._dateTo = dateTo;
+    this._basePrice = basePrice;
+    this._offers = offers;
+    this._editHandler = null;
   }
 
-  get _icon() {
-    return Icons[this._type.toUpperCase()];
+  get _title() {
+    let title;
+
+    if (Movements.has(this._type)) {
+      title = `${this._type[0].toUpperCase()}${this._type.slice(1)} to ${this._destination}`;
+    } else if (Places.has(this._type)) {
+      title = `${this._type[0].toUpperCase()}${this._type.slice(1)} in ${this._destination}`;
+    } else {
+      title = this._destination;
+    }
+
+    return title;
   }
 
-  get _startTimeFormatted() {
-    return parseTime(this._startTime);
+  get _dateFromFormatted() {
+    return parseTime(this._dateFrom);
   }
 
-  get _endTimeFormatted() {
-    return parseTime(this._endTime);
+  get _dateToFormatted() {
+    return parseTime(this._dateTo);
   }
 
   get _timeDiff() {
-    return parseTimeDiff(this._endTime - this._startTime);
+    return parseTimeDiff(new Date(this._dateTo) - new Date(this._dateFrom));
   }
 
-  get _optionsParsed() {
-    return setOptions(this._options);
+  get _offersParsed() {
+    return setOffers(this._offers);
+  }
+
+  get _price() {
+    return this._basePrice;
+  }
+
+  updatePoint({base_price: basePrice, date_from: dateFrom, date_to: dateTo, destination, offers, type}) {
+    this._type = type;
+    this._destination = destination;
+    this._dateFrom = dateFrom;
+    this._dateTo = dateTo;
+    this._basePrice = basePrice;
+    this._offers = offers;
+
+    this.rerender();
   }
 
   getTemplate() {
     return `<div class="event">
             <div class="event__type">
-              <img class="event__type-icon" width="42" height="42" src="img/icons/${this._icon}.png" alt="${this._type}">
+              <img class="event__type-icon" width="42" height="42" src="img/icons/${this._type}.png" alt="${this._type}">
             </div>
             <h3 class="event__title">${this._title}</h3>
 
             <div class="event__schedule">
               <p class="event__time">
-                <time class="event__start-time" datetime="${this._startTime}">${this._startTimeFormatted}</time>
+                <time class="event__start-time" datetime="${this._dateFrom}">${this._dateFromFormatted}</time>
                 &mdash;
-                <time class="event__end-time" datetime="${this._endTime}">${this._endTimeFormatted}</time>
+                <time class="event__end-time" datetime="${this._dateTo}">${this._dateToFormatted}</time>
               </p>
               <p class="event__duration">${this._timeDiff}</p>
             </div>
@@ -116,7 +133,7 @@ export default class Point extends AbstractComponent {
               &euro;&nbsp;<span class="event__price-value">${this._price}</span>
             </p>
 
-            ${this._optionsParsed}
+            ${this._offersParsed}
 
             <button class="event__rollup-btn" type="button">
               <span class="visually-hidden">Open event</span>
@@ -125,6 +142,11 @@ export default class Point extends AbstractComponent {
   }
 
   setEditHandler(handler) {
+    this._editHandler = handler;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+  }
+
+  recoveryListeners() {
+    this.setEditHandler(this._editHandler);
   }
 }
