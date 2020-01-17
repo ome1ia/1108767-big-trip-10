@@ -359,7 +359,7 @@ export default class PointEdit extends AbstractSmartComponent {
         },
         changeHandler: (dates, date) => {
           const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
-          this._newData.dateFrom = newDate;
+          this._newData.date_from = newDate;
         }
       });
     });
@@ -381,7 +381,7 @@ export default class PointEdit extends AbstractSmartComponent {
         },
         changeHandler: (dates, date) => {
           const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
-          this._newData.dateTo = newDate;
+          this._newData.date_to = newDate;
         },
         startDate: this._dateFrom,
       });
