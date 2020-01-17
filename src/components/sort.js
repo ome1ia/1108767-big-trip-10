@@ -1,6 +1,6 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
-export default class Sort extends AbstractComponent {
+export default class Sort extends AbstractSmartComponent {
   constructor(sortType) {
     super();
     this._sortType = sortType;

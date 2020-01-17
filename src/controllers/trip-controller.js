@@ -6,6 +6,7 @@ import TotalSum from '../components/total-sum.js';
 import TripTitle from '../components/trip-title.js';
 import PointController from './point-controller.js';
 import {render} from '../utils/render.js';
+import moment from 'moment';
 
 export default class TripController {
   constructor({tripData, offers, destinations, sumContainer, titleContainer, container}) {
@@ -28,22 +29,21 @@ export default class TripController {
   _getSort() {
     if (!this._sort) {
       const sort = new Sort(this._sortType);
+      this._sort = sort;
 
-      sort.setSortHandler((evt) => {
+      this._sort.setSortHandler((evt) => {
         const input = evt.target;
         const value = input.getAttribute(`data-sort`);
 
         if (this._sortType !== value) {
           this._sortType = value;
-          this._getSort().removeElement();
+          this._sort.removeElement();
           this._getTripList().removeElement();
           this._sort = null;
           this._tripList = null;
           this.render();
         }
       });
-
-      this._sort = sort;
     }
 
     return this._sort;
@@ -103,7 +103,7 @@ export default class TripController {
   }
 
   _sortByTime() {
-    const pointsData = this._tripData().sort((first, second) => {
+    const pointsData = this._tripData.sort((first, second) => {
       const firstDuration = first.endTime - first.startTime;
       const secondDuration = second.endTime - second.startTime;
       return secondDuration - firstDuration;
@@ -111,20 +111,20 @@ export default class TripController {
 
     const tripData = [{
       day: null,
-      events: pointsData
+      points: pointsData
     }];
 
     this._renderTripList(tripData);
   }
 
   _sortByPrice() {
-    const pointsData = this._tripData().sort((first, second) => {
+    const pointsData = this._tripData.sort((first, second) => {
       return second.price - first.price;
     });
 
     const tripData = [{
       day: null,
-      events: pointsData
+      points: pointsData
     }];
 
     this._renderTripList(tripData);
@@ -137,9 +137,16 @@ export default class TripController {
   _onDataChange({point, newData}) {
     for (let oldPoint of this._tripData) {
       if (oldPoint.id === newData.id) {
+        const isNeedRenderList = newData.date_from && (moment(oldPoint.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear());
         const newPoint = Object.assign(oldPoint, newData);
         oldPoint = newPoint;
-        point.update(newPoint);
+
+        if (isNeedRenderList) {
+          this._update();
+        } else {
+          point.update(newPoint);
+        }
+
         break;
       }
     }
@@ -149,6 +156,20 @@ export default class TripController {
     for (let point of this._points) {
       point.setDefaultView();
     }
+  }
+
+  _update() {
+    this._totalSum.removeElement();
+    this._title.removeElement();
+    this._sort.removeElement();
+    this._getTripList().removeElement();
+
+    this._totalSum = null;
+    this._title = null;
+    this._sort = null;
+    this._tripList = null;
+
+    this.render();
   }
 
   render() {
@@ -163,8 +184,8 @@ export default class TripController {
     }
 
     if (this._title === null) {
-      const title = new TripTitle(this._getDays());
-      render(this._titleContainer, title, `prepend`);
+      this._title = new TripTitle(this._getDays());
+      render(this._titleContainer, this._title, `prepend`);
     }
 
     if (!this._tripData.length) {
