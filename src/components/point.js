@@ -1,34 +1,32 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
+import moment from 'moment';
 
 const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
 const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
 
 const parseTime = (time) => {
-  const timeParsed = /T\d{2}:\d{2}/.exec(time.toString());
-  return timeParsed[0].slice(1);
+  return moment(time).format(`HH:mm`);
 };
 
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
-const parseTimeDiff = (diff) => {
-  let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hoursDiff = diff - (days * 1000 * 60 * 60 * 24);
-  let hours = Math.floor(hoursDiff / (1000 * 60 * 60));
-  const minutesDiff = hoursDiff - (hours * 1000 * 60 * 60);
-  let minutes = Math.floor(minutesDiff / (1000 * 60));
+const parseTimeDiff = (dateTo, dateFrom) => {
+  dateTo = moment(dateTo);
+  dateFrom = moment(dateFrom);
+  const timeDiff = moment.duration(dateTo - dateFrom);
+  let template;
 
-  if (days) {
-    days = `${castTimeFormat(days)}D `;
+  if (timeDiff.days()) {
+    template = `${castTimeFormat(timeDiff.days())}D ${castTimeFormat(timeDiff.hours())}H ${castTimeFormat(timeDiff.minutes())}M`;
+  } else if (timeDiff.hours()) {
+    template = `${castTimeFormat(timeDiff.hours())}H ${castTimeFormat(timeDiff.minutes())}M`;
   } else {
-    days = ``;
+    template = `${castTimeFormat(timeDiff.minutes())}M`;
   }
 
-  hours = `${castTimeFormat(hours)}H `;
-  minutes = `${castTimeFormat(minutes)}M`;
-
-  return `${days}${hours}${minutes}`;
+  return template;
 };
 
 const setOffers = (offers) => {
@@ -91,7 +89,7 @@ export default class Point extends AbstractSmartComponent {
   }
 
   get _timeDiff() {
-    return parseTimeDiff(new Date(this._dateTo) - new Date(this._dateFrom));
+    return parseTimeDiff(this._dateTo, this._dateFrom);
   }
 
   get _offersParsed() {

@@ -1,16 +1,15 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
+import moment from 'moment';
+import {createElement} from '../utils/create-element.js';
 
 const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
 const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
 
 const parseTime = (time) => {
-  const year = time.getFullYear();
-  const month = time.getMonth();
-  const day = time.getDate();
-  const hours = time.getHours();
-  const minutes = time.getMinutes();
-
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
+  return moment(time).format(`DD/MM/YYYY HH:mm`);
 };
 
 const setOffers = ({type, offers, activeOffers}) => {
@@ -122,6 +121,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._newData = {id: data.id};
     this._offers = offers;
     this._destinations = destinations;
+    this._flatpickr = null;
     this._addToFavoriteHandler = null;
     this._submitHandler = null;
     this._escapeHandler = null;
@@ -146,11 +146,11 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   get _dateFromFormatted() {
-    return parseTime(new Date(this._dateFrom));
+    return parseTime(this._dateFrom);
   }
 
   get _dateToFormatted() {
-    return parseTime(new Date(this._dateTo));
+    return parseTime(this._dateTo);
   }
 
   get _cities() {
@@ -280,6 +280,25 @@ export default class PointEdit extends AbstractSmartComponent {
           </form>`;
   }
 
+  rerender() {
+    this._removeFlatpickr();
+    super.rerender();
+  }
+
+  _rerenderDate(input, template) {
+    const newInput = createElement(template);
+    input.replaceWith(newInput);
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this.setAddToFavoriteHandler(this._AddToFavoriteHandler);
+    this.setChangeTypeHandler();
+    this.setChangeCityHandler();
+    this.setFlatpickrDateFromHandler();
+    this.setFlatpickrDateToHandler();
+  }
+
   setAddToFavoriteHandler(handler) {
     this._addToFavoriteHandler = handler;
     this._newData.isFavorite = this._newData.is_favorite ? !this._newData.is_favorite : !this._isFavorite;
@@ -324,10 +343,73 @@ export default class PointEdit extends AbstractSmartComponent {
     });
   }
 
-  recoveryListeners() {
-    this.setSubmitHandler(this._submitHandler);
-    this.setAddToFavoriteHandler(this._AddToFavoriteHandler);
-    this.setChangeTypeHandler();
-    this.setChangeCityHandler();
+  setFlatpickrDateFromHandler() {
+    this.getElement().elements[`event-start-time`].addEventListener(`focus`, () => {
+      const input = this.getElement().elements[`event-start-time`];
+      this._applyFlatpickr({
+        element: input,
+        date: this._dateFrom,
+        closeHandler: (dates, date) => {
+          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
+          this._dateFrom = newDate;
+          const updatedTemplate = `<input class="event__input  event__input--time" id="event-start-time-${this._id}" type="text" name="event-start-time" value="${this._dateFromFormatted}">`;
+          this._flatpickr.set(`defaultDate`, newDate);
+          this._rerenderDate(input, updatedTemplate);
+          this.setFlatpickrDateFromHandler();
+        },
+        changeHandler: (dates, date) => {
+          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
+          this._newData.dateFrom = newDate;
+        }
+      });
+    });
+  }
+
+  setFlatpickrDateToHandler() {
+    this.getElement().elements[`event-end-time`].addEventListener(`focus`, () => {
+      const input = this.getElement().elements[`event-end-time`];
+      this._applyFlatpickr({
+        element: input,
+        date: this._dateTo,
+        closeHandler: (dates, date) => {
+          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
+          this._dateTo = newDate;
+          const updatedTemplate = `<input class="event__input  event__input--time" id="event-end-time-${this._id}" type="text" name="event-end-time" value="${this._dateToFormatted}">`;
+          this._flatpickr.set(`defaultDate`, newDate);
+          this._rerenderDate(input, updatedTemplate);
+          this.setFlatpickrDateToHandler();
+        },
+        changeHandler: (dates, date) => {
+          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
+          this._newData.dateTo = newDate;
+        },
+        startDate: this._dateFrom,
+      });
+    });
+  }
+
+  _applyFlatpickr({element, date, closeHandler, changeHandler, startDate = null}) {
+    this._removeFlatpickr();
+
+    this._flatpickr = flatpickr(element, {
+      defaultDate: date,
+      enableTime: true,
+      dateFormat: `d/m/Y H:i`,
+      onClose: closeHandler,
+      onChange: changeHandler
+    });
+
+    if (startDate) {
+      this._flatpickr.set(`minDate`, startDate);
+    }
+
+    this._flatpickr.open();
+  }
+
+  _removeFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
   }
 }

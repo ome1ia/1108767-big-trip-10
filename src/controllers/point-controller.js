@@ -55,6 +55,8 @@ export default class PointController {
     });
     pointEdit.setChangeTypeHandler();
     pointEdit.setChangeCityHandler();
+    pointEdit.setFlatpickrDateFromHandler();
+    pointEdit.setFlatpickrDateToHandler();
 
     render(this._container.getPointsContainer(), point);
   }
