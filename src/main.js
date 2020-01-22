@@ -1,3 +1,4 @@
+import Points from './models/points.js'
 import Menu from './components/menu.js'
 import Filters from './components/filters.js'
 import TripController from './controllers/trip-controller.js'
@@ -14,6 +15,7 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const totalSumElement = siteHeaderElement.querySelector(`.trip-info__cost-value`);
 
 const tripData = getEventsList();
+const pointsModel = new Points(tripData);
 const destinations = getDestination();
 
 const menu = new Menu();
@@ -22,9 +24,9 @@ render(siteNavTitleElement, menu, `after`);
 const filters = new Filters();
 render(siteFilterTitleElement, filters, `after`)
 
-const tripController = new TripController({ tripData: tripData, 
-                                            offers: offers, 
-                                            destinations: destinations, 
+const tripController = new TripController({ pointsModel, 
+                                            offers, 
+                                            destinations, 
                                             container: tripEventsElement, 
                                             sumContainer: totalSumElement,
                                             titleContainer: tripInfoElement

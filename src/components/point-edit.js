@@ -25,14 +25,14 @@ const setOffers = ({type, offers, activeOffers}) => {
     checkedOffers.add(offer.title);
   });
 
-  for (let offer of availableOffers) {
-    const offerTitle = offer.title;
-    const offerPrice = offer.price;
-    const isChecked = checkedOffers.has(offer.title) ? `checked` : ``;
+  for (let i = 0; i < availableOffers.length; i++) {
+    const offerTitle = availableOffers[i].title;
+    const offerPrice = availableOffers[i].price;
+    const isChecked = checkedOffers.has(offerTitle) ? `checked` : ``;
 
     template += `<div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isChecked}>
-                  <label class="event__offer-label" for="event-offer-luggage-1">
+                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-${i}" type="checkbox" name="event-offer-${i}" value="${offerTitle}" ${isChecked}>
+                  <label class="event__offer-label" for="event-offer-${i}">
                     <span class="event__offer-title">${offerTitle}</span>
                     &plus;
                     &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -118,7 +118,6 @@ export default class PointEdit extends AbstractSmartComponent {
     this._dateTo = data.date_to;
     this._basePrice = data.base_price;
     this._activeOffers = data.offers;
-    this._newData = {id: data.id};
     this._offers = offers;
     this._destinations = destinations;
     this._flatpickr = null;
@@ -191,8 +190,9 @@ export default class PointEdit extends AbstractSmartComponent {
     return setPointTypes({activeType: this._type, id: this._id});
   }
 
-  getNewData() {
-    return this._newData;
+  getData() {
+    const form = this.getElement();
+    return new FormData(form);
   }
 
   getTemplate() {
@@ -280,8 +280,19 @@ export default class PointEdit extends AbstractSmartComponent {
           </form>`;
   }
 
-  rerender() {
+  rerender(data) {
     this._removeFlatpickr();
+
+    if (data) {
+      this._type = data.type;
+      this._destination = data.destination;
+      this._isFavorite = data.is_favorite;
+      this._dateFrom = data.date_from;
+      this._dateTo = data.date_to;
+      this._basePrice = data.base_price;
+      this._activeOffers = data.offers;
+    }
+
     super.rerender();
   }
 
@@ -292,7 +303,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
-    this.setAddToFavoriteHandler(this._AddToFavoriteHandler);
+    this.setAddToFavoriteHandler(this._addToFavoriteHandler);
     this.setChangeTypeHandler();
     this.setChangeCityHandler();
     this.setFlatpickrDateFromHandler();
@@ -301,7 +312,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
   setAddToFavoriteHandler(handler) {
     this._addToFavoriteHandler = handler;
-    this._newData.isFavorite = this._newData.is_favorite ? !this._newData.is_favorite : !this._isFavorite;
     this.getElement().elements[`event-favorite`].addEventListener(`change`, handler);
   }
 
@@ -324,7 +334,6 @@ export default class PointEdit extends AbstractSmartComponent {
     [...this.getElement().elements[`event-type`]].forEach((input) => {
       input.addEventListener(`change`, (evt) => {
         this._type = evt.target.getAttribute(`value`);
-        this._newData.type = evt.target.getAttribute(`value`);
         this.rerender();
       });
     });
@@ -336,7 +345,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
       if (this._cities.has(newCity)) {
         this._destination = newCity;
-        this._newData.destination = newCity;
         this.rerender();
       }
       // TODO подумать над обработкой ошибок
@@ -357,10 +365,6 @@ export default class PointEdit extends AbstractSmartComponent {
           this._rerenderDate(input, updatedTemplate);
           this.setFlatpickrDateFromHandler();
         },
-        changeHandler: (dates, date) => {
-          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
-          this._newData.date_from = newDate;
-        }
       });
     });
   }
@@ -378,10 +382,6 @@ export default class PointEdit extends AbstractSmartComponent {
           this._flatpickr.set(`defaultDate`, newDate);
           this._rerenderDate(input, updatedTemplate);
           this.setFlatpickrDateToHandler();
-        },
-        changeHandler: (dates, date) => {
-          const newDate = moment(date, `DD/MM/YYYY h:m`).toISOString();
-          this._newData.date_to = newDate;
         },
         startDate: this._dateFrom,
       });

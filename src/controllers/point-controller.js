@@ -1,6 +1,7 @@
 import Point from '../components/point.js';
 import PointEdit from '../components/point-edit.js';
 import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
+import moment from 'moment';
 
 export default class PointController {
   constructor({container, data, offers, destinations, onDataChange, onViewChange}) {
@@ -17,6 +18,41 @@ export default class PointController {
   _hideEditForm() {
     this._pointEdit.removeEscapeHandler();
     replaceTripForm(this._pointEdit, this._point);
+  }
+
+  _parseForm(formData) {
+    const dateFrom = formData.get(`event-start-time`);
+    const dateTo = formData.get(`event-end-time`);
+    const parsedData = {id: this._data.id};
+    parsedData[`type`] = formData.get(`event-type`);
+    parsedData[`destination`] = formData.get(`event-destination`);
+    parsedData[`is_favorite`] = (formData.get(`event-favorite`) === `on`) ? true : false;
+    parsedData[`date_from`] = moment(dateFrom, `DD/MM/YYYY h:m`).toISOString();
+    parsedData[`date_to`] = moment(dateTo, `DD/MM/YYYY h:m`).toISOString();
+    parsedData[`base_price`] = formData.get(`event-price`);
+    parsedData[`offers`] = [];
+
+    for (let [name, value] of formData) {
+      if (~name.indexOf(`event-offer`)) {
+        parsedData.offers.push({title: value});
+      }
+    }
+
+    if (parsedData.offers.length) {
+      const availableOffers = this._offers.filter((offers) => {
+        return offers.type === parsedData.type;
+      })[0];
+
+      for (let checkedOffer of parsedData.offers) {
+        const price = availableOffers.offers.filter((offer) => {
+          return offer.title === checkedOffer.title;
+        })[0].price;
+
+        checkedOffer.price = price;
+      }
+    }
+
+    return parsedData;
   }
 
   render(data = this._data) {
@@ -42,16 +78,16 @@ export default class PointController {
     pointEdit.setSubmitHandler((evt) => {
       evt.preventDefault();
 
-      const newData = pointEdit.getNewData();
-      this._onDataChange({point: this, newData});
+      const newData = this._parseForm(pointEdit.getData());
 
+      this._onDataChange({point: this, newData, oldData: this._data});
       this._hideEditForm();
     });
     pointEdit.setAddToFavoriteHandler(() => {
       const newData = this._data;
-      newData.isFavorite = !this._data.isFavorite;
+      newData[`is_favorite`] = !this._data.is_favorite;
 
-      this._onDataChange({point: this, newPoint: newData});
+      this._onDataChange({point: this, newData, oldData: this._data});
     });
     pointEdit.setChangeTypeHandler();
     pointEdit.setChangeCityHandler();
@@ -63,8 +99,6 @@ export default class PointController {
 
   update(data) {
     this._data = data;
-
-    this._pointEdit.rerender();
     this._point.updatePoint(this._data);
   }
 

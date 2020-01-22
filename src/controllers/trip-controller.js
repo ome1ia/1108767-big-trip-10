@@ -9,8 +9,8 @@ import {render} from '../utils/render.js';
 import moment from 'moment';
 
 export default class TripController {
-  constructor({tripData, offers, destinations, sumContainer, titleContainer, container}) {
-    this._tripData = tripData;
+  constructor({pointsModel, offers, destinations, sumContainer, titleContainer, container}) {
+    this._pointsModel = pointsModel;
     this._offers = offers;
     this._destinations = destinations;
     this._sumContainer = sumContainer;
@@ -53,7 +53,7 @@ export default class TripController {
     const days = [];
     const pointGroups = {};
 
-    this._tripData.forEach((point) => {
+    this._pointsModel.getPoints().forEach((point) => {
       const day = point.date_from.match(/[\d-]*/g)[0];
 
       pointGroups[day] = pointGroups[day] || [];
@@ -103,52 +103,45 @@ export default class TripController {
   }
 
   _sortByTime() {
-    const pointsData = this._tripData.sort((first, second) => {
+    const points = this._pointsModel.getPoints().sort((first, second) => {
       const firstDuration = first.endTime - first.startTime;
       const secondDuration = second.endTime - second.startTime;
       return secondDuration - firstDuration;
     });
 
-    const tripData = [{
+    const trip = [{
       day: null,
-      points: pointsData
+      points
     }];
 
-    this._renderTripList(tripData);
+    this._renderTripList(trip);
   }
 
   _sortByPrice() {
-    const pointsData = this._tripData.sort((first, second) => {
+    const points = this._pointsModel.getPoints().sort((first, second) => {
       return second.price - first.price;
     });
 
-    const tripData = [{
+    const trip = [{
       day: null,
-      points: pointsData
+      points
     }];
 
-    this._renderTripList(tripData);
+    this._renderTripList(trip);
   }
 
   _sortByDefault() {
     this._renderTripList(this._getDays());
   }
 
-  _onDataChange({point, newData}) {
-    for (let oldPoint of this._tripData) {
-      if (oldPoint.id === newData.id) {
-        const isNeedRenderList = newData.date_from && (moment(oldPoint.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear());
-        const newPoint = Object.assign(oldPoint, newData);
-        oldPoint = newPoint;
+  _onDataChange({point, newData, oldData}) {
+    const isNeedRenderList = newData.date_from && (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear());
+    const newPoint = this._pointsModel.updatePoint(newData.id, newData);
 
-        if (isNeedRenderList) {
-          this._update();
-        } else {
-          point.update(newPoint);
-        }
-
-        break;
-      }
+    if (isNeedRenderList) {
+      this._update();
+    } else {
+      point.update(newPoint);
     }
   }
 
@@ -174,7 +167,7 @@ export default class TripController {
 
   render() {
     if (this._totalSum === null) {
-      this._totalSum = new TotalSum(this._tripData);
+      this._totalSum = new TotalSum(this._pointsModel.getPoints());
 
       while (this._sumContainer.firstChild) {
         this._sumContainer.removeChild(this._sumContainer.firstChild);
@@ -188,7 +181,7 @@ export default class TripController {
       render(this._titleContainer, this._title, `prepend`);
     }
 
-    if (!this._tripData.length) {
+    if (!this._pointsModel.getPoints().length) {
       const emptyList = new EmptyList();
       render(this._container, emptyList, `append`);
     } else {
