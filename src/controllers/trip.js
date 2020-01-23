@@ -110,8 +110,8 @@ export default class TripController {
 
   _sortByTime() {
     const points = this._pointsModel.getPoints().sort((first, second) => {
-      const firstDuration = first.endTime - first.startTime;
-      const secondDuration = second.endTime - second.startTime;
+      const firstDuration = moment(first.date_to).diff(moment(first.date_from));
+      const secondDuration = moment(second.date_to).diff(moment(second.date_from));
       return secondDuration - firstDuration;
     });
 
@@ -125,7 +125,7 @@ export default class TripController {
 
   _sortByPrice() {
     const points = this._pointsModel.getPoints().sort((first, second) => {
-      return second.price - first.price;
+      return second.base_price - first.base_price;
     });
 
     const trip = [{
