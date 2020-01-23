@@ -13,10 +13,10 @@ export default class getTotalSum extends AbstractComponent {
 
   getPrice() {
     const price = this._pointsList.reduce((sum, point) => {
-      sum += (+point.base_price);
+      sum += parseFloat(point.base_price);
 
       sum += point.offers.reduce((pointSum, offer) => {
-        pointSum += (+offer.price);
+        pointSum += parseFloat(offer.price);
         return pointSum;
       }, 0);
 

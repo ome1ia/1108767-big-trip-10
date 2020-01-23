@@ -148,7 +148,7 @@ export default class TripController {
       updates.add(`updateTitle`);
     }
 
-    if ((newData.base_price !== oldData.base_price) || this._compareOffersSum(newData.offers, oldData.offers)) {
+    if ((parseFloat(newData.base_price) !== parseFloat(oldData.base_price)) || this._compareOffersSum(newData.offers, oldData.offers)) {
       updates.add(`updateSum`);
     }
 
@@ -243,11 +243,13 @@ export default class TripController {
 
   _compareOffersSum(newOffers = [], oldOffers) {
     const newSum = newOffers.reduce((sum, offer) => {
-      sum += offer.price;
+      return sum += parseFloat(offer.price);
     }, 0);
+
     const oldSum = oldOffers.reduce((sum, offer) => {
-      sum += offer.price;
+      return sum += parseFloat(offer.price);
     }, 0);
+
     return newSum !== oldSum;
   }
 }
