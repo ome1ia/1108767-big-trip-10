@@ -4,7 +4,7 @@ import TripList from '../components/trip-list.js';
 import Day from '../components/day.js';
 import TotalSum from '../components/total-sum.js';
 import TripTitle from '../components/trip-title.js';
-import PointController from './point-controller.js';
+import PointController from './point.js';
 import {render} from '../utils/render.js';
 import moment from 'moment';
 
@@ -16,14 +16,20 @@ export default class TripController {
     this._sumContainer = sumContainer;
     this._titleContainer = titleContainer;
     this._container = container;
+
+    this._emptyList = null;
     this._tripList = null;
     this._sort = null;
     this._sortType = `event`;
     this._totalSum = null;
     this._title = null;
     this._points = null;
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
   _getSort() {
@@ -135,11 +141,25 @@ export default class TripController {
   }
 
   _onDataChange({point, newData, oldData}) {
-    const isNeedRenderList = newData.date_from && (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear());
+    const updates = new Set();
+
+    if (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear()) {
+      updates.add(`updateDate`);
+      updates.add(`updateTitle`);
+    }
+
+    if ((newData.base_price !== oldData.base_price) || this._compareOffersSum(newData.offers, oldData.offers)) {
+      updates.add(`updateSum`);
+    }
+
+    if (newData.destination !== oldData.destination) {
+      updates.add(`updateTitle`);
+    }
+
     const newPoint = this._pointsModel.updatePoint(newData.id, newData);
 
-    if (isNeedRenderList) {
-      this._update();
+    if (updates.size) {
+      this._update(updates);
     } else {
       point.update(newPoint);
     }
@@ -151,16 +171,35 @@ export default class TripController {
     }
   }
 
-  _update() {
-    this._totalSum.removeElement();
-    this._title.removeElement();
-    this._sort.removeElement();
-    this._getTripList().removeElement();
+  _onFilterChange() {
+    this._update();
+  }
 
-    this._totalSum = null;
-    this._title = null;
-    this._sort = null;
-    this._tripList = null;
+  _update(updates) {
+    if (updates && updates.has(`updateSum`)) {
+      this._totalSum.removeElement();
+      this._totalSum = null;
+    }
+
+    if (updates && updates.has(`updateTitle`)) {
+      this._title.removeElement();
+      this._title = null;
+    }
+
+    if (this._sort) {
+      this._sort.removeElement();
+      this._sort = null;
+    }
+
+    if (this._tripList) {
+      this._tripList.removeElement();
+      this._tripList = null;
+    }
+
+    if (this._emptyList) {
+      this._emptyList.removeElement();
+      this._emptyList = null;
+    }
 
     this.render();
   }
@@ -183,6 +222,7 @@ export default class TripController {
 
     if (!this._pointsModel.getPoints().length) {
       const emptyList = new EmptyList();
+      this._emptyList = emptyList;
       render(this._container, emptyList, `append`);
     } else {
       switch (this._sortType) {
@@ -199,5 +239,15 @@ export default class TripController {
           break;
       }
     }
+  }
+
+  _compareOffersSum(newOffers = [], oldOffers) {
+    const newSum = newOffers.reduce((sum, offer) => {
+      sum += offer.price;
+    }, 0);
+    const oldSum = oldOffers.reduce((sum, offer) => {
+      sum += offer.price;
+    }, 0);
+    return newSum !== oldSum;
   }
 }

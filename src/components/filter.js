@@ -1,6 +1,6 @@
 import AbstractComponent from './abstract-component.js';
 
-export default class Filters extends AbstractComponent {
+export default class Filter extends AbstractComponent {
   getTemplate() {
     return `<form class="trip-filters" action="#" method="get">
               <div class="trip-filters__filter">
@@ -20,5 +20,14 @@ export default class Filters extends AbstractComponent {
 
               <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`;
+  }
+
+  setFilterChangeHandler(handler) {
+    [...this.getElement().querySelectorAll(`.trip-filters__filter-input`)].forEach((input) => {
+      input.addEventListener(`change`, (evt) => {
+        const newFilter = evt.target.value;
+        handler(newFilter);
+      });
+    });
   }
 }

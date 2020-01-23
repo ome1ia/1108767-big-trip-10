@@ -1,7 +1,7 @@
 import Points from './models/points.js'
 import Menu from './components/menu.js'
-import Filters from './components/filters.js'
-import TripController from './controllers/trip-controller.js'
+import FilterController from './controllers/filter.js'
+import TripController from './controllers/trip.js'
 import {getEventsList} from './mock/event.js'
 import {offers} from './mock/offer.js'
 import {getDestination} from './mock/destination.js'
@@ -21,8 +21,8 @@ const destinations = getDestination();
 const menu = new Menu();
 render(siteNavTitleElement, menu, `after`);
 
-const filters = new Filters();
-render(siteFilterTitleElement, filters, `after`)
+const filter = new FilterController({pointsModel, container: siteFilterTitleElement});
+filter.render();
 
 const tripController = new TripController({ pointsModel, 
                                             offers, 
