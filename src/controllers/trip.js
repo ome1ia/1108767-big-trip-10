@@ -9,13 +9,15 @@ import {render} from '../utils/render.js';
 import moment from 'moment';
 
 export default class TripController {
-  constructor({pointsModel, offers, destinations, sumContainer, titleContainer, container}) {
+  constructor({pointsModel, offers, destinations, sumContainer, titleContainer, container, addPoint}) {
     this._pointsModel = pointsModel;
     this._offers = offers;
     this._destinations = destinations;
     this._sumContainer = sumContainer;
     this._titleContainer = titleContainer;
     this._container = container;
+    this._addPointElement = addPoint;
+    this._newPoint = null;
 
     this._emptyList = null;
     this._tripList = null;
@@ -30,6 +32,12 @@ export default class TripController {
     this._onFilterChange = this._onFilterChange.bind(this);
 
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
+
+    this._addPointElement.addEventListener(`click`, () => {
+      const point = new PointController({container: this._container, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange, onViewChange: this._onViewChange, action: `addPoint`});
+      point.render();
+      this._newPoint = null;
+    });
   }
 
   _getSort() {
@@ -141,28 +149,43 @@ export default class TripController {
   }
 
   _onDataChange({point, newData, oldData}) {
-    const updates = new Set();
-
-    if (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear()) {
-      updates.add(`updateDate`);
-      updates.add(`updateTitle`);
-    }
-
-    if ((parseFloat(newData.base_price) !== parseFloat(oldData.base_price)) || this._compareOffersSum(newData.offers, oldData.offers)) {
-      updates.add(`updateSum`);
-    }
-
-    if (newData.destination !== oldData.destination) {
-      updates.add(`updateTitle`);
-    }
-
-    const newPoint = this._pointsModel.updatePoint(newData.id, newData);
-
-    if (updates.size) {
+    if (!newData) {
+      
+      const updates = new Set([`updateDate`, `updateTitle`, `updateSum`]);
+      this._pointsModel.removePoint(oldData.id);
       this._update(updates);
+
+    } else if (!oldData) {
+
+      const updates = new Set([`updateDate`, `updateTitle`, `updateSum`]);
+      this._pointsModel.addPoint(newData);
+      this._update(updates);
+
     } else {
-      point.update(newPoint);
+      
+      const updates = new Set();
+
+      if (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear()) {
+        updates.add(`updateDate`);
+        updates.add(`updateTitle`);
+      }
+
+      if ((parseFloat(newData.base_price) !== parseFloat(oldData.base_price)) || this._compareOffersSum(newData.offers, oldData.offers)) {
+        updates.add(`updateSum`);
+      }
+
+      if (newData.destination !== oldData.destination) {
+        updates.add(`updateTitle`);
+      }
+
+      if (updates.size) {
+        this._update(updates);
+      } else {
+        const newPoint = this._pointsModel.updatePoint(newData.id, newData);
+        point.update(newPoint);
+      }
     }
+
   }
 
   _onViewChange() {

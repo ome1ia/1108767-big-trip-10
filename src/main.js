@@ -13,6 +13,7 @@ const siteNavTitleElement = siteHeaderElement.querySelector(`.js-trip-main__nav-
 const siteFilterTitleElement = siteHeaderElement.querySelector(`.js-trip-main__filter-title`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const totalSumElement = siteHeaderElement.querySelector(`.trip-info__cost-value`);
+const addPointElement = siteHeaderElement.querySelector(`.trip-main__event-add-btn`);
 
 const tripData = getEventsList();
 const pointsModel = new Points(tripData);
@@ -29,6 +30,7 @@ const tripController = new TripController({ pointsModel,
                                             destinations, 
                                             container: tripEventsElement, 
                                             sumContainer: totalSumElement,
-                                            titleContainer: tripInfoElement
+                                            titleContainer: tripInfoElement,
+                                            addPoint: addPointElement
                                           });
 tripController.render();

@@ -124,6 +124,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._addToFavoriteHandler = null;
     this._submitHandler = null;
     this._escapeHandler = null;
+    this._removeHandler = null;
   }
 
   get _title() {
@@ -308,6 +309,11 @@ export default class PointEdit extends AbstractSmartComponent {
     this.setChangeCityHandler();
     this.setFlatpickrDateFromHandler();
     this.setFlatpickrDateToHandler();
+  }
+
+  setRemoveHandler(handler) {
+    this.removeHandler = handler;
+    this.getElement().querySelectorAll(`.event__reset-btn`)[0].addEventListener(`click`, handler);
   }
 
   setAddToFavoriteHandler(handler) {

@@ -27,13 +27,12 @@ export default class Points {
     return this._points;
   }
 
-  setFilter(filter) {
-    this._activeFilter = filter;
-    this._callHandlers(this._filterChangeHandlers);
-  }
-
   setPoints(points) {
     this._points = points;
+  }
+
+  addPoint(point) {
+    this._points.push(point);
   }
 
   updatePoint(id, newData) {
@@ -48,6 +47,17 @@ export default class Points {
     }
 
     return updatedPoint;
+  }
+
+  removePoint(id) {
+    this._points = this._points.filter((point) => {
+      return point.id !== id;
+    })
+  }
+
+  setFilter(filter) {
+    this._activeFilter = filter;
+    this._callHandlers(this._filterChangeHandlers);
   }
 
   setFilterChangeHandler(handler) {

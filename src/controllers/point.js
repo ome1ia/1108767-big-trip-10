@@ -4,7 +4,7 @@ import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
 import moment from 'moment';
 
 export default class PointController {
-  constructor({container, data, offers, destinations, onDataChange, onViewChange}) {
+  constructor({container, data, offers, destinations, onDataChange, onViewChange, action = null}) {
     this._container = container;
     this._data = data;
     this._offers = offers;
@@ -13,6 +13,7 @@ export default class PointController {
     this._onViewChange = onViewChange;
     this._point = null;
     this._pointEdit = null;
+    this._action = action;
   }
 
   _hideEditForm() {
@@ -60,8 +61,11 @@ export default class PointController {
       this._data = data;
     }
 
-    const point = new Point(this._data);
-    const pointEdit = new PointEdit({data: this._data, offers: this._offers, destinations: this._destinations});
+    const pointData = this._data ? this._data : {id: 1, type: `taxi`, destination: ``, is_favorite: false, date_from: moment().toISOString(), date_to: moment().toISOString(), base_price: 0, offers: []};
+
+    const point = new Point(pointData);
+    const pointEdit = new PointEdit({data: pointData, offers: this._offers, destinations: this._destinations});
+
     this._point = point;
     this._pointEdit = pointEdit;
 
@@ -79,7 +83,6 @@ export default class PointController {
       evt.preventDefault();
 
       const newData = this._parseForm(pointEdit.getData());
-
       this._onDataChange({point: this, newData, oldData: this._data});
       this._hideEditForm();
     });
@@ -89,12 +92,21 @@ export default class PointController {
 
       this._onDataChange({point: this, newData, oldData: this._data});
     });
+    pointEdit.setRemoveHandler((evt) => {
+      evt.preventDefault();
+
+      this._onDataChange({point: this, newData: null, oldData: this._data});
+    });
     pointEdit.setChangeTypeHandler();
     pointEdit.setChangeCityHandler();
     pointEdit.setFlatpickrDateFromHandler();
     pointEdit.setFlatpickrDateToHandler();
 
-    render(this._container.getPointsContainer(), point);
+    if (this._action === `addPoint`) {
+      render(this._container.getElement(), pointEdit, `before`);
+    } else {
+      render(this._container.getPointsContainer(), point);
+    }
   }
 
   update(data) {
