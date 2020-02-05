@@ -52,7 +52,7 @@ export default class Points {
   removePoint(id) {
     this._points = this._points.filter((point) => {
       return point.id !== id;
-    })
+    });
   }
 
   setFilter(filter) {

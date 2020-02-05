@@ -8,107 +8,8 @@ import {createElement} from '../utils/create-element.js';
 const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
 const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
 
-const parseTime = (time) => {
-  return moment(time).format(`DD/MM/YYYY HH:mm`);
-};
-
-const setOffers = ({type, offers, activeOffers}) => {
-  let template = ``;
-
-  const availableOffers = offers.filter((offer) => {
-    return offer.type === type;
-  })[0].offers;
-
-  const checkedOffers = new Set();
-
-  activeOffers.forEach((offer) => {
-    checkedOffers.add(offer.title);
-  });
-
-  for (let i = 0; i < availableOffers.length; i++) {
-    const offerTitle = availableOffers[i].title;
-    const offerPrice = availableOffers[i].price;
-    const isChecked = checkedOffers.has(offerTitle) ? `checked` : ``;
-
-    template += `<div class="event__offer-selector">
-                  <input class="event__offer-checkbox  visually-hidden" id="event-offer-${i}" type="checkbox" name="event-offer-${i}" value="${offerTitle}" ${isChecked}>
-                  <label class="event__offer-label" for="event-offer-${i}">
-                    <span class="event__offer-title">${offerTitle}</span>
-                    &plus;
-                    &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-                  </label>
-                </div>`;
-  }
-
-  return template;
-};
-
-const setPhotoes = ({city, destinations}) => {
-  const photoes = destinations.filter((destination) => {
-    return destination.name.toLowerCase() === city.toLowerCase();
-  })[0].pictures;
-
-  let template = ``;
-
-  for (let photo of photoes) {
-    template += `<img class="event__photo" src="${photo.src}" alt="${photo.description}"> `;
-  }
-
-  return template;
-};
-
-const setCities = (cities) => {
-  let template = ``;
-
-  for (let city of cities) {
-    template += `<option value="${city.name}"></option>`;
-  }
-
-  return template;
-};
-
-const setDescription = ({city, destinations}) => {
-  const description = destinations.filter((destination) => {
-    return destination.name === city;
-  })[0].description;
-
-  return description;
-};
-
-const setType = ({type, activeType, id}) => {
-  const title = type[0].toUpperCase() + type.slice(1);
-  const isChecked = (type === activeType) ? `checked` : ``;
-
-  return `<div class="event__type-item">
-                      <input id="event-type-${type}-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
-                      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-${id}">${title}</label>
-                    </div>`;
-};
-
-const setPointTypes = ({activeType, id}) => {
-  let template = `<fieldset class="event__type-group">
-                    <legend class="visually-hidden">Transfer</legend>`;
-
-  for (let type of Movements) {
-    template += setType({type, activeType, id});
-  }
-
-  template += `</fieldset>
-
-                  <fieldset class="event__type-group">
-                    <legend class="visually-hidden">Activity</legend>`;
-
-  for (let type of Places) {
-    template += setType({type, activeType, id});
-  }
-
-  template += `</fieldset>`;
-
-  return template;
-};
-
 export default class PointEdit extends AbstractSmartComponent {
-  constructor({data, offers, destinations}) {
+  constructor({data, offers, destinations, action}) {
     super();
     this._id = data.id;
     this._type = data.type;
@@ -120,6 +21,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._activeOffers = data.offers;
     this._offers = offers;
     this._destinations = destinations;
+    this._action = action;
     this._flatpickr = null;
     this._addToFavoriteHandler = null;
     this._submitHandler = null;
@@ -142,15 +44,19 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   get _icon() {
-    return this._type;
+    return this._type ? this._type : this._offers[0].type;
+  }
+
+  get _addPointClass() {
+    return this._action === `addPoint` ? `trip-events__item` : ``;
   }
 
   get _dateFromFormatted() {
-    return parseTime(this._dateFrom);
+    return this._parseTime(this._dateFrom);
   }
 
   get _dateToFormatted() {
-    return parseTime(this._dateTo);
+    return this._parseTime(this._dateTo);
   }
 
   get _cities() {
@@ -164,19 +70,76 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   get _citiesAvailable() {
-    return setCities(this._destinations);
+    let template = ``;
+
+    for (let city of this._destinations) {
+      template += `<option value="${city.name}"></option>`;
+    }
+
+    return template;
   }
 
   get _description() {
-    return setDescription({city: this._destination, destinations: this._destinations});
+    if (this._destination) {
+      const description = this._destinations.filter((destination) => {
+        return destination.name === this._destination;
+      })[0].description;
+
+      return description;
+    } else {
+      return ``;
+    }
   }
 
   get _offersParsed() {
-    return setOffers({type: this._type, offers: this._offers, activeOffers: this._activeOffers});
+    let template = ``;
+
+    if (this._type) {
+      const availableOffers = this._offers.filter((offer) => {
+        return offer.type === this._type;
+      })[0].offers;
+
+      const checkedOffers = new Set();
+
+      this._activeOffers.forEach((offer) => {
+        checkedOffers.add(offer.title);
+      });
+
+      for (let i = 0; i < availableOffers.length; i++) {
+        const offerTitle = availableOffers[i].title;
+        const offerPrice = availableOffers[i].price;
+        const isChecked = checkedOffers.has(offerTitle) ? `checked` : ``;
+
+        template += `<div class="event__offer-selector">
+                      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${i}" type="checkbox" name="event-offer-${i}" value="${offerTitle}" ${isChecked}>
+                      <label class="event__offer-label" for="event-offer-${i}">
+                        <span class="event__offer-title">${offerTitle}</span>
+                        &plus;
+                        &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+                      </label>
+                    </div>`;
+      }
+    }
+
+    return template;
   }
 
   get _photoesParsed() {
-    return setPhotoes({city: this._destination, destinations: this._destinations});
+    if (this._destination) {
+      const photoes = this._destinations.filter((destination) => {
+        return destination.name.toLowerCase() === this._destination.toLowerCase();
+      })[0].pictures;
+
+      let template = ``;
+
+      for (let photo of photoes) {
+        template += `<img class="event__photo" src="${photo.src}" alt="${photo.description}"> `;
+      }
+
+      return template;
+    } else {
+      return ``;
+    }
   }
 
   get _isFavoriteState() {
@@ -188,7 +151,53 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   get _typeList() {
-    return setPointTypes({activeType: this._type, id: this._id});
+    let template = `<fieldset class="event__type-group">
+                      <legend class="visually-hidden">Transfer</legend>`;
+
+    for (let type of Movements) {
+      template += this._setType(type);
+    }
+
+    template += `</fieldset>
+
+                    <fieldset class="event__type-group">
+                      <legend class="visually-hidden">Activity</legend>`;
+
+    for (let type of Places) {
+      template += this._setType(type);
+    }
+
+    template += `</fieldset>`;
+
+    return template;
+  }
+
+  get _eventDetails() {
+    if (this._type && this._destination) {
+      return `<section class="event__details">
+
+              <section class="event__section  event__section--offers">
+                <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+                <div class="event__available-offers">
+                  ${this._offersParsed}
+                </div>
+              </section>
+
+              <section class="event__section  event__section--destination">
+                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+                <p class="event__destination-description">${this._description}</p>
+
+                <div class="event__photos-container">
+                  <div class="event__photos-tape">
+                    ${this._photoesParsed}
+                  </div>
+                </div>
+              </section>
+            </section>`;
+    } else {
+      return ``;
+    }
   }
 
   getData() {
@@ -197,12 +206,12 @@ export default class PointEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return `<form class="event  event--edit" action="#" method="post">
+    return `<form class="${this._addPointClass} event  event--edit" action="#" method="post">
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-${this._id}">
                   <span class="visually-hidden">Choose event type</span>
-                  <img class="event__type-icon" width="17" height="17" src="img/icons/${this._type}.png" alt="${this._type}">
+                  <img class="event__type-icon" width="17" height="17" src="img/icons/${this._icon}.png" alt="${this._icon}">
                 </label>
                 <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${this._id}" type="checkbox">
 
@@ -257,27 +266,7 @@ export default class PointEdit extends AbstractSmartComponent {
               </button>
             </header>
 
-            <section class="event__details">
-
-              <section class="event__section  event__section--offers">
-                <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-                <div class="event__available-offers">
-                  ${this._offersParsed}
-                </div>
-              </section>
-
-              <section class="event__section  event__section--destination">
-                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${this._description}</p>
-
-                <div class="event__photos-container">
-                  <div class="event__photos-tape">
-                    ${this._photoesParsed}
-                  </div>
-                </div>
-              </section>
-            </section>
+            ${this._eventDetails}
           </form>`;
   }
 
@@ -295,6 +284,11 @@ export default class PointEdit extends AbstractSmartComponent {
     }
 
     super.rerender();
+  }
+
+  removeElement() {
+    document.removeEventListener(`keydown`, this._escapeHandler);
+    super.removeElement();
   }
 
   _rerenderDate(input, template) {
@@ -417,5 +411,19 @@ export default class PointEdit extends AbstractSmartComponent {
       this._flatpickr.destroy();
       this._flatpickr = null;
     }
+  }
+
+  _parseTime(time) {
+    return moment(time).format(`DD/MM/YYYY HH:mm`);
+  }
+
+  _setType(type) {
+    const title = type[0].toUpperCase() + type.slice(1);
+    const isChecked = (type === this._type) ? `checked` : ``;
+
+    return `<div class="event__type-item">
+              <input id="event-type-${type}-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${isChecked}>
+              <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-${this._id}">${title}</label>
+            </div>`;
   }
 }

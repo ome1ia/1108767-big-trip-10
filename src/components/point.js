@@ -4,56 +4,6 @@ import moment from 'moment';
 const Movements = new Set([`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`]);
 const Places = new Set([`check-in`, `sightseeing`, `restaurant`]);
 
-const parseTime = (time) => {
-  return moment(time).format(`HH:mm`);
-};
-
-const castTimeFormat = (value) => {
-  return value < 10 ? `0${value}` : String(value);
-};
-
-const parseTimeDiff = (dateTo, dateFrom) => {
-  dateTo = moment(dateTo);
-  dateFrom = moment(dateFrom);
-  const timeDiff = moment.duration(dateTo - dateFrom);
-  let template;
-
-  if (timeDiff.days()) {
-    template = `${castTimeFormat(timeDiff.days())}D ${castTimeFormat(timeDiff.hours())}H ${castTimeFormat(timeDiff.minutes())}M`;
-  } else if (timeDiff.hours()) {
-    template = `${castTimeFormat(timeDiff.hours())}H ${castTimeFormat(timeDiff.minutes())}M`;
-  } else {
-    template = `${castTimeFormat(timeDiff.minutes())}M`;
-  }
-
-  return template;
-};
-
-const setOffers = (offers) => {
-  let template = ``;
-  const offersSize = Math.min(offers.length, 3);
-
-  if (offersSize) {
-    for (let i = 0; i < offersSize; i++) {
-      const offerTitle = offers[i].title;
-      const offerPrice = offers[i].price;
-
-      template += `<li class="event__offer">
-              <span class="event__offer-title">${offerTitle}</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-             </li>`;
-    }
-
-    template = `<h4 class="visually-hidden">Offers:</h4>
-          <ul class="event__selected-offers">
-            ${template}
-          </ul>`;
-  }
-
-  return template;
-};
-
 export default class Point extends AbstractSmartComponent {
   constructor({base_price: basePrice, date_from: dateFrom, date_to: dateTo, destination, offers, type}) {
     super();
@@ -81,19 +31,53 @@ export default class Point extends AbstractSmartComponent {
   }
 
   get _dateFromFormatted() {
-    return parseTime(this._dateFrom);
+    return moment(this._dateFrom).format(`HH:mm`);
   }
 
   get _dateToFormatted() {
-    return parseTime(this._dateTo);
+    return moment(this._dateTo).format(`HH:mm`);
   }
 
   get _timeDiff() {
-    return parseTimeDiff(this._dateTo, this._dateFrom);
+    const dateTo = moment(this._dateTo);
+    const dateFrom = moment(this._dateFrom);
+    const timeDiff = moment.duration(dateTo - dateFrom);
+    let template;
+
+    if (timeDiff.days()) {
+      template = `${this._castTimeFormat(timeDiff.days())}D ${this._castTimeFormat(timeDiff.hours())}H ${this._castTimeFormat(timeDiff.minutes())}M`;
+    } else if (timeDiff.hours()) {
+      template = `${this._castTimeFormat(timeDiff.hours())}H ${this._castTimeFormat(timeDiff.minutes())}M`;
+    } else {
+      template = `${this._castTimeFormat(timeDiff.minutes())}M`;
+    }
+
+    return template;
   }
 
   get _offersParsed() {
-    return setOffers(this._offers);
+    let template = ``;
+    const offersSize = Math.min(this._offers.length, 3);
+
+    if (offersSize) {
+      for (let i = 0; i < offersSize; i++) {
+        const offerTitle = this._offers[i].title;
+        const offerPrice = this._offers[i].price;
+
+        template += `<li class="event__offer">
+                <span class="event__offer-title">${offerTitle}</span>
+                &plus;
+                &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+               </li>`;
+      }
+
+      template = `<h4 class="visually-hidden">Offers:</h4>
+            <ul class="event__selected-offers">
+              ${template}
+            </ul>`;
+    }
+
+    return template;
   }
 
   get _price() {
@@ -146,5 +130,9 @@ export default class Point extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setEditHandler(this._editHandler);
+  }
+
+  _castTimeFormat(value) {
+    return value < 10 ? `0${value}` : String(value);
   }
 }

@@ -34,9 +34,10 @@ export default class TripController {
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
 
     this._addPointElement.addEventListener(`click`, () => {
-      const point = new PointController({container: this._container, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange, onViewChange: this._onViewChange, action: `addPoint`});
+      const pointContainer = this._pointsModel.getPoints().length ? this._tripList.getElement() : this._emptyList.getElement();
+      const point = new PointController({container: pointContainer, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange, onViewChange: this._onViewChange, action: `addPoint`});
+      this._newPoint = point;
       point.render();
-      this._newPoint = null;
     });
   }
 
@@ -96,7 +97,7 @@ export default class TripController {
   }
 
   _renderTripList(days) {
-    const points = [];
+    const points = new Set();
 
     days.forEach((dayData, i) => {
       const day = new Day(dayData, i);
@@ -104,7 +105,7 @@ export default class TripController {
       dayData.points.forEach((pointData) => {
         const point = new PointController({container: day, data: pointData, offers: this._offers, destinations: this._destinations, onDataChange: this._onDataChange, onViewChange: this._onViewChange});
         point.render();
-        points.push(point);
+        points.add(point);
       });
 
       render(this._getTripList().getElement(), day);
@@ -149,20 +150,20 @@ export default class TripController {
   }
 
   _onDataChange({point, newData, oldData}) {
+
     if (!newData) {
-      
       const updates = new Set([`updateDate`, `updateTitle`, `updateSum`]);
       this._pointsModel.removePoint(oldData.id);
+      this._points.delete(point);
       this._update(updates);
 
     } else if (!oldData) {
-
       const updates = new Set([`updateDate`, `updateTitle`, `updateSum`]);
       this._pointsModel.addPoint(newData);
+      this._points.add(point);
       this._update(updates);
 
     } else {
-      
       const updates = new Set();
 
       if (moment(oldData.date_from).dayOfYear() !== moment(newData.date_from).dayOfYear()) {
@@ -178,19 +179,22 @@ export default class TripController {
         updates.add(`updateTitle`);
       }
 
+      const newPoint = this._pointsModel.updatePoint(newData.id, newData);
+      point.update(newPoint);
+
       if (updates.size) {
         this._update(updates);
-      } else {
-        const newPoint = this._pointsModel.updatePoint(newData.id, newData);
-        point.update(newPoint);
       }
     }
-
   }
 
   _onViewChange() {
     for (let point of this._points) {
       point.setDefaultView();
+    }
+    if (this._newPoint) {
+      this._newPoint.remove();
+      this._newPoint = null;
     }
   }
 
@@ -244,10 +248,13 @@ export default class TripController {
     }
 
     if (!this._pointsModel.getPoints().length) {
+
       const emptyList = new EmptyList();
       this._emptyList = emptyList;
       render(this._container, emptyList, `append`);
+
     } else {
+
       switch (this._sortType) {
         case `time`:
           this._sortByTime();
@@ -261,16 +268,19 @@ export default class TripController {
           this._sortByDefault();
           break;
       }
+
     }
   }
 
   _compareOffersSum(newOffers = [], oldOffers) {
     const newSum = newOffers.reduce((sum, offer) => {
-      return sum += parseFloat(offer.price);
+      sum += parseFloat(offer.price);
+      return sum;
     }, 0);
 
     const oldSum = oldOffers.reduce((sum, offer) => {
-      return sum += parseFloat(offer.price);
+      sum += parseFloat(offer.price);
+      return sum;
     }, 0);
 
     return newSum !== oldSum;

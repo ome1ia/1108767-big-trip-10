@@ -1,6 +1,7 @@
 import Point from '../components/point.js';
 import PointEdit from '../components/point-edit.js';
 import {render, replaceTripForm, replaceTrip} from '../utils/render.js';
+import {getRandom} from '../utils/random.js';
 import moment from 'moment';
 
 export default class PointController {
@@ -24,7 +25,8 @@ export default class PointController {
   _parseForm(formData) {
     const dateFrom = formData.get(`event-start-time`);
     const dateTo = formData.get(`event-end-time`);
-    const parsedData = {id: this._data.id};
+    const id = this._data ? this._data.id : getRandom(1000);
+    const parsedData = {id};
     parsedData[`type`] = formData.get(`event-type`);
     parsedData[`destination`] = formData.get(`event-destination`);
     parsedData[`is_favorite`] = (formData.get(`event-favorite`) === `on`) ? true : false;
@@ -61,10 +63,10 @@ export default class PointController {
       this._data = data;
     }
 
-    const pointData = this._data ? this._data : {id: 1, type: `taxi`, destination: ``, is_favorite: false, date_from: moment().toISOString(), date_to: moment().toISOString(), base_price: 0, offers: []};
+    const pointData = this._data ? this._data : {'id': 1, 'type': ``, 'destination': ``, 'is_favorite': false, 'date_from': moment().toISOString(), 'date_to': moment().toISOString(), 'base_price': 0, 'offers': []};
 
     const point = new Point(pointData);
-    const pointEdit = new PointEdit({data: pointData, offers: this._offers, destinations: this._destinations});
+    const pointEdit = new PointEdit({data: pointData, offers: this._offers, destinations: this._destinations, action: this._action});
 
     this._point = point;
     this._pointEdit = pointEdit;
@@ -92,19 +94,52 @@ export default class PointController {
 
       this._onDataChange({point: this, newData, oldData: this._data});
     });
-    pointEdit.setRemoveHandler((evt) => {
-      evt.preventDefault();
 
-      this._onDataChange({point: this, newData: null, oldData: this._data});
-    });
     pointEdit.setChangeTypeHandler();
     pointEdit.setChangeCityHandler();
     pointEdit.setFlatpickrDateFromHandler();
     pointEdit.setFlatpickrDateToHandler();
 
     if (this._action === `addPoint`) {
-      render(this._container.getElement(), pointEdit, `before`);
+      pointEdit.setSubmitHandler((evt) => {
+        evt.preventDefault();
+
+        const newData = this._parseForm(pointEdit.getData());
+
+        if ((newData.type !== null) && (newData.destination !== ``)) {
+          this._onDataChange({point: this, newData, oldData: this._data});
+          this._pointEdit.removeElement();
+        } else {
+          // TODO handle error
+        }
+      });
+
+      pointEdit.setEscapeHandler((evt) => {
+        if (evt.key === `Escape`) {
+          this._pointEdit.removeElement();
+          this._pointEdit.removeEscapeHandler();
+        }
+      });
+
+      pointEdit.setRemoveHandler(() => {
+        this.remove();
+      });
+
+      render(this._container, pointEdit, `before`);
     } else {
+      pointEdit.setSubmitHandler((evt) => {
+        evt.preventDefault();
+
+        const newData = this._parseForm(pointEdit.getData());
+        this._onDataChange({point: this, newData, oldData: this._data});
+        this._hideEditForm();
+      });
+
+      pointEdit.setRemoveHandler((evt) => {
+        evt.preventDefault();
+        this._onDataChange({point: this, newData: null, oldData: this._data});
+      });
+
       render(this._container.getPointsContainer(), point);
     }
   }
@@ -116,5 +151,10 @@ export default class PointController {
 
   setDefaultView() {
     this._hideEditForm();
+  }
+
+  remove() {
+    this._point.removeElement();
+    this._pointEdit.removeElement();
   }
 }
